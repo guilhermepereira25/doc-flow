@@ -1,5 +1,10 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, Model, Scopes, Table } from 'sequelize-typescript';
 
+@Scopes(() => ({
+  excludePassword: {
+    attributes: { exclude: ['password'] },
+  },
+}))
 @Table({
   tableName: 'users',
   timestamps: false,
@@ -23,12 +28,12 @@ export class User extends Model {
   })
   password: string;
   @Column({
-    type: DataType.TIME,
+    type: DataType.DATE,
     defaultValue: DataType.NOW(),
   })
   created_at: Date;
   @Column({
-    type: DataType.TIME,
+    type: DataType.DATE,
     defaultValue: DataType.NOW(),
   })
   updated_at: Date;

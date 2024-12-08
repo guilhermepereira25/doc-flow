@@ -39,9 +39,12 @@ export class UserRepositoryImpl implements UserRepository {
     return `This action updates a #${id} user`;
   }
 
-  async remove(id: string): Promise<string> {
-    // Implement remove logic here
-    return `This action removes a #${id} user`;
+  async remove(id: string): Promise<number> {
+    return await this.userModel.destroy({
+      where: {
+        id,
+      },
+    });
   }
 
   async findByUsername(username: string): Promise<User> {

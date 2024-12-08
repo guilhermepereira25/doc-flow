@@ -7,7 +7,7 @@ export interface UserRepository {
   findAll(page: number): Promise<User[]>;
   findOne(id: string): Promise<User>;
   update(id: string, updateUserDto: UpdateUserDto): Promise<string>;
-  remove(id: string): Promise<string>;
+  remove(id: string): Promise<number>;
   findByUsername(username: string): Promise<User>;
   findByPk(id: string): Promise<User>;
 }

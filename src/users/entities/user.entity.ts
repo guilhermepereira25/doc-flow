@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Scopes, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  Model,
+  Scopes,
+  Table,
+} from 'sequelize-typescript';
+import { Profile } from 'src/profile/entities/profile.entity';
 
 @Scopes(() => ({
   excludePassword: {
@@ -28,6 +36,11 @@ export class User extends Model {
   })
   password: string;
   @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  profile_id: string;
+  @Column({
     type: DataType.DATE,
     defaultValue: DataType.NOW(),
   })
@@ -37,4 +50,7 @@ export class User extends Model {
     defaultValue: DataType.NOW(),
   })
   updated_at: Date;
+
+  @BelongsTo(() => Profile, 'profile_id')
+  profile: Profile;
 }

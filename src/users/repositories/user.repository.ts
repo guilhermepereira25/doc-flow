@@ -4,6 +4,8 @@ import { UserRepository } from './user.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { Profile } from 'src/profile/entities/profile.entity';
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -52,6 +54,18 @@ export class UserRepositoryImpl implements UserRepository {
       where: {
         username,
       },
+      include: [
+        {
+          model: Profile,
+          attributes: ['id', 'name'],
+          include: [
+            {
+              model: Role,
+              attributes: ['id', 'name'],
+            },
+          ],
+        },
+      ],
     });
     if (!user) {
       return null;

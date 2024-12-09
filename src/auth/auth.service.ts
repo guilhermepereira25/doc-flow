@@ -29,7 +29,12 @@ export class AuthService {
   }
 
   private async generateJwtPayloadAndGetAccessToken(user: User) {
-    const payload = { sub: user.id, username: user.username };
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      profile: user.profile,
+      profile_roles: user.profile?.roles,
+    };
     return await this.jwtService.signAsync(payload);
   }
 

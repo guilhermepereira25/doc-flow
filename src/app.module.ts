@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
+import { ProfileGuard } from './profile/profile.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -56,6 +57,10 @@ import { JwtModule } from '@nestjs/jwt';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    {
+      provide: APP_GUARD,
+      useClass: ProfileGuard,
+    }
   ],
 })
 export class AppModule {}

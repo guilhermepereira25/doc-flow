@@ -5,4 +5,6 @@ export class SignUpAuthDto {
   username: string;
   @IsStrongPassword()
   password: string;
+  @IsString()
+  profileId?: string;
 }

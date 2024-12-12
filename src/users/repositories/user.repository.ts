@@ -14,10 +14,27 @@ export class UserRepositoryImpl implements UserRepository {
     private userModel: typeof User,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = await this.userModel.create({
-      ...createUserDto,
-    });
+  async create(createUserDto: CreateUserDto, profileId: string): Promise<User> {
+    const newUser = await this.userModel.create(
+      {
+        ...createUserDto,
+        profile_id: profileId,
+      },
+      {
+        include: [
+          {
+            model: Profile,
+            attributes: ['id', 'name'],
+            include: [
+              {
+                model: Role,
+                attributes: ['id', 'name'],
+              },
+            ],
+          },
+        ],
+      },
+    );
     return newUser;
   }
 

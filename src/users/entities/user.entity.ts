@@ -2,10 +2,12 @@ import {
   BelongsTo,
   Column,
   DataType,
+  HasMany,
   Model,
   Scopes,
   Table,
 } from 'sequelize-typescript';
+import { Presence } from 'src/presences/entities/presence.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
 
 @Scopes(() => ({
@@ -53,4 +55,7 @@ export class User extends Model {
 
   @BelongsTo(() => Profile, 'profile_id')
   profile: Profile;
+
+  @HasMany(() => Presence, 'user_id')
+  presences: Presence[];
 }

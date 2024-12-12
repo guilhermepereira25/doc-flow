@@ -11,7 +11,7 @@ module.exports = {
      */
     return queryInterface.createTable('users', {
       id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
       },

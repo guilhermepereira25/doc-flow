@@ -1,5 +1,7 @@
 'use strict';
 
+const { after } = require('node:test');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -12,6 +14,7 @@ module.exports = {
     return queryInterface.addColumn('users', 'profile_id', {
       type: Sequelize.STRING,
       allowNull: false,
+      after: 'id',
     });
   },
 

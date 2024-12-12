@@ -14,18 +14,18 @@ import { User } from 'src/users/entities/user.entity';
 })
 export class Presence extends Model {
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     primaryKey: true,
     defaultValue: DataType.UUIDV4,
   })
   id: number;
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
   })
   user_id: number;
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
   })
   event_id: number;

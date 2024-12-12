@@ -7,7 +7,7 @@ import { Presence } from 'src/presences/entities/presence.entity';
 })
 export class Event extends Model {
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     primaryKey: true,
     defaultValue: DataType.UUIDV4,
   })

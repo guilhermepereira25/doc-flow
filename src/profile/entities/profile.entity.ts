@@ -15,7 +15,7 @@ import { User } from 'src/users/entities/user.entity';
 })
 export class Profile extends Model {
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
     primaryKey: true,
     defaultValue: DataType.UUIDV4,

@@ -13,7 +13,7 @@ import { Profile } from 'src/profile/entities/profile.entity';
 })
 export class Role extends Model {
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
     primaryKey: true,
     defaultValue: DataType.UUIDV4,

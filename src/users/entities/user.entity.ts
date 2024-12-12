@@ -21,7 +21,7 @@ import { Profile } from 'src/profile/entities/profile.entity';
 })
 export class User extends Model {
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
     primaryKey: true,
     defaultValue: DataType.UUIDV4,
@@ -38,7 +38,7 @@ export class User extends Model {
   })
   password: string;
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
   })
   profile_id: string;

@@ -9,7 +9,7 @@ export class Event extends Model {
   @Column({
     type: DataType.STRING,
     primaryKey: true,
-    autoIncrement: true,
+    defaultValue: DataType.UUIDV4,
   })
   id: number;
   @Column({
@@ -30,6 +30,6 @@ export class Event extends Model {
   })
   updated_at: Date;
 
-  @HasMany(() => Presence)
+  @HasMany(() => Presence, 'event_id')
   presences: Presence[];
 }

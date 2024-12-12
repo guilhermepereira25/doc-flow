@@ -14,11 +14,19 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { Profiles } from 'src/profile/decorators/profile.decorator';
 import { Profile } from 'src/profile/enum/profile.enum';
 import { Response } from 'express';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Event } from './entities/event.entity';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
+  @ApiOperation({ summary: 'Create an event' })
+  @ApiResponse({
+    status: 201,
+    description: 'Create an event',
+    type: Event,
+  })
   @Profiles(Profile.Admin, Profile.Professor)
   @Post()
   async create(@Res() res: Response, @Body() createEventDto: CreateEventDto) {
@@ -36,14 +44,47 @@ export class EventsController {
     }
   }
 
+  @ApiOperation({ summary: 'Return all events' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all events',
+    schema: {
+      example: {
+        users: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440000',
+            name: 'EVENT 1',
+          },
+          {
+            id: '550e8400-e29b-41d4-a716-446655440001',
+            name: 'EVENT 2',
+          },
+        ],
+      },
+    },
+  })
   @Get()
-  findAll() {
-    return this.eventsService.findAll();
+  async findAll(@Res() res: Response) {
+    try {
+      const events = await this.eventsService.findAll();
+      return res.status(200).json(events);
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res.status(500).json({ message: 'Internal server error' });
+    }
   }
 
+  @ApiOperation({ summary: 'Return an event' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return an event',
+    type: Event,
+  })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.eventsService.findOne(id);
   }
 
   @Profiles(Profile.Admin, Profile.Professor)

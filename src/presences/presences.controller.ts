@@ -15,11 +15,30 @@ import { UpdatePresenceDto } from './dto/update-presence.dto';
 import { Response } from 'express';
 import { Profiles } from 'src/profile/decorators/profile.decorator';
 import { Profile } from 'src/profile/enum/profile.enum';
+import {
+  ApiInternalServerErrorResponse,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { Presence } from './entities/presence.entity';
 
 @Controller('presences')
 export class PresencesController {
   constructor(private readonly presencesService: PresencesService) {}
 
+  @ApiOperation({ summary: 'Create a presence' })
+  @ApiResponse({
+    status: 201,
+    description: 'Create a presence',
+    type: Presence,
+  })
+  @ApiInternalServerErrorResponse({
+    schema: {
+      example: {
+        message: 'Internal server error',
+      },
+    },
+  })
   @Profiles(Profile.Student)
   @Post()
   async create(
@@ -50,6 +69,28 @@ export class PresencesController {
     }
   }
 
+  @ApiOperation({ summary: 'Return all presences' })
+  @Profiles(Profile.Admin, Profile.Admin)
+  @ApiResponse({
+    status: 200,
+    description: 'Return all presences',
+    schema: {
+      example: {
+        presences: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440000',
+            event_id: '550e8400-e29b-41d4-a716-446655440000',
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
+          },
+          {
+            id: '550e8400-e29b-41d4-a716-446655440001',
+            event_id: '550e8400-e29b-41d4-a716-446655440000',
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
+          },
+        ],
+      },
+    },
+  })
   @Get()
   async findAll(@Res() res: Response) {
     try {
@@ -63,6 +104,18 @@ export class PresencesController {
     }
   }
 
+  @ApiOperation({ summary: 'Return a presence' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return a presence',
+    schema: {
+      example: {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        event_id: '550e8400-e29b-41d4-a716-446655440000',
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
+      },
+    },
+  })
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
@@ -117,6 +170,27 @@ export class PresencesController {
     }
   }
 
+  @ApiOperation({ summary: 'Get all presences for event' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get all presences for event',
+    schema: {
+      example: {
+        presences: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440000',
+            event_id: '550e8400-e29b-41d4-a716-446655440000',
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
+          },
+          {
+            id: '550e8400-e29b-41d4-a716-446655440001',
+            event_id: '550e8400-e29b-41d4-a716-446655440000',
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
+          },
+        ],
+      },
+    },
+  })
   @Get('event/:id')
   async findAllByEvent(@Param('id') id: string, @Res() res: Response) {
     try {
@@ -130,6 +204,27 @@ export class PresencesController {
     }
   }
 
+  @ApiOperation({ summary: 'Get all presences for user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get all presences for user',
+    schema: {
+      example: {
+        presences: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440000',
+            event_id: '550e8400-e29b-41d4-a716-446655440000',
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
+          },
+          {
+            id: '550e8400-e29b-41d4-a716-446655440001',
+            event_id: '550e8400-e29b-41d4-a716-446655440000',
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
+          },
+        ],
+      },
+    },
+  })
   @Get('user/:id')
   async findAllByUser(@Param('id') id: string, @Res() res: Response) {
     try {

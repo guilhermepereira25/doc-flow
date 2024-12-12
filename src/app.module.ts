@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersModule } from './users/users.module';
@@ -26,7 +25,7 @@ import { ProfileGuard } from './profile/profile.guard';
       port: parseInt(process.env.POSGRES_PORT || '5432'),
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
+      database: process.env.POSTGRES_DATABASE,
       autoLoadModels: true,
       models: [__dirname + '/**/*.entity{.ts, .js}'],
       modelMatch: (filename, member) => {
@@ -50,7 +49,7 @@ import { ProfileGuard } from './profile/profile.guard';
     PresencesModule,
     AuthModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
     AppService,
     {

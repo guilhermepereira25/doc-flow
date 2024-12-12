@@ -14,10 +14,18 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Response } from 'express';
 import { Profiles } from './decorators/profile.decorator';
 import { Profile } from './enum/profile.enum';
+import { Profile as ProfileModel } from './entities/profile.entity';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
+  @ApiOperation({ summary: 'Create a profile' })
+  @ApiResponse({
+    status: 201,
+    description: 'The record created',
+    type: ProfileModel,
+  })
   @Profiles(Profile.Admin)
   @Post()
   async create(
@@ -38,6 +46,25 @@ export class ProfileController {
     }
   }
 
+  @ApiOperation({ summary: 'Return all profiles' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all profiles',
+    schema: {
+      example: {
+        profiles: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440000',
+            name: 'admin',
+          },
+          {
+            id: '550e8400-e29b-41d4-a716-446655440001',
+            name: 'user',
+          },
+        ],
+      },
+    },
+  })
   @Get()
   async findAll(@Res() res: Response) {
     try {
@@ -51,20 +78,29 @@ export class ProfileController {
     }
   }
 
+  @ApiOperation({ summary: 'Return a profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'The profile found',
+    type: ProfileModel,
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.profileService.findOne(+id);
+    return this.profileService.findOne(id);
   }
 
   @Profiles(Profile.Admin)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
     return this.profileService.update(+id, updateProfileDto);
   }
 
   @Profiles(Profile.Admin)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.profileService.remove(+id);
   }
 }

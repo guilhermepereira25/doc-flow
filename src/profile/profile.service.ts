@@ -3,6 +3,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileRepository } from './repositories/profile.repository.interface';
 import { PROFILE_REPOSITORY } from './repositories/profile-repository.token';
+import { Profile } from './entities/profile.entity';
 @Injectable()
 export class ProfileService {
   constructor(
@@ -25,14 +26,23 @@ export class ProfileService {
     return await this.profileRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+  async findOne(id: string): Promise<null | Profile> {
+    const profile = await this.profileRepository.findOne(id);
+    if (!profile) {
+      return null;
+    }
+    return profile;
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
+  async update(id: number, updateProfileDto: UpdateProfileDto) {
     return `This action updates a #${id} profile`;
   }
-  remove(id: number) {
+
+  async remove(id: number) {
     return `This action removes a #${id} profile`;
+  }
+
+  async findByProfileName(name: string): Promise<null | Profile> {
+    return await this.profileRepository.findByProfileName(name);
   }
 }

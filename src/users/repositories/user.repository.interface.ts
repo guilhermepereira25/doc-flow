@@ -3,7 +3,7 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 
 export interface UserRepository {
-  create(createUserDto: CreateUserDto): Promise<User>;
+  create(createUserDto: CreateUserDto, profileId: string): Promise<User>;
   findAll(page: number): Promise<User[]>;
   findOne(id: string): Promise<User>;
   update(id: string, updateUserDto: UpdateUserDto): Promise<string>;

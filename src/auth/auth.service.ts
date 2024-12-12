@@ -5,7 +5,6 @@ import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { SignUpAuthDto } from './dto/singup-auth.dto';
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -33,7 +32,6 @@ export class AuthService {
       sub: user.id,
       username: user.username,
       profile: user.profile,
-      profile_roles: user.profile?.roles,
     };
     return await this.jwtService.signAsync(payload);
   }
@@ -60,12 +58,13 @@ export class AuthService {
   async signUp(signupDto: SignUpAuthDto): Promise<{ access_token: string }> {
     const user = await this.usersService.findByUsername(signupDto.username);
     if (user) {
-      return null;
+      throw new Error('User already exists');
     }
     const hashedPassword = await this.hashPassword(signupDto.password);
     const newUser = await this.usersService.create({
       username: signupDto.username,
       password: hashedPassword,
+      profileId: signupDto.profileId,
     });
     const accessToken = await this.generateJwtPayloadAndGetAccessToken(newUser);
     return {

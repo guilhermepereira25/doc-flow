@@ -4,11 +4,21 @@ import { SignInAuthDto } from './dto/signin-auth.dto';
 import { Response } from 'express';
 import { SignUpAuthDto } from './dto/singup-auth.dto';
 import { Public } from './decorators/public-auth.decorator';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiResponse({
+    status: 200,
+    description: 'Sign in',
+    schema: {
+      example: {
+        accessToken: 'token',
+      },
+    },
+  })
   @Public()
   @Post('signin')
   async signIn(@Res() res: Response, @Body() signinDto: SignInAuthDto) {
@@ -26,6 +36,15 @@ export class AuthController {
     }
   }
 
+  @ApiResponse({
+    status: 201,
+    description: 'Sign up',
+    schema: {
+      example: {
+        accessToken: 'token',
+      },
+    },
+  })
   @Public()
   @Post('signup')
   async signUp(@Res() res: Response, @Body() signupDto: SignUpAuthDto) {

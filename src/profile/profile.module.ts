@@ -8,8 +8,13 @@ import { PROFILE_REPOSITORY } from './repositories/profile-repository.token';
 @Module({
   imports: [SequelizeModule.forFeature([Profile])],
   controllers: [ProfileController],
-  providers: [ProfileService, {
-    provide: PROFILE_REPOSITORY, useClass: ProfileRepositoryImpl,
-  }],
+  providers: [
+    ProfileService, 
+    {
+      provide: PROFILE_REPOSITORY, 
+      useClass: ProfileRepositoryImpl,
+    }
+  ],
+  exports: [ProfileService],
 })
 export class ProfileModule {}

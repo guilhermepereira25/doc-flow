@@ -8,6 +8,7 @@ import {
   Scopes,
   Table,
 } from 'sequelize-typescript';
+import { File } from 'src/files/entities/file.entity';
 import { Presence } from 'src/presences/entities/presence.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
 
@@ -84,4 +85,7 @@ export class User extends Model {
 
   @HasMany(() => Presence, 'user_id')
   presences: Presence[];
+
+  @HasMany(() => File, 'user_id')
+  files: File[];
 }

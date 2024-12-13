@@ -10,8 +10,8 @@ services:
     volumes:
       - ./:/var/www/app
     networks:
-        - network-doc-flow
-    command: npm start
+      - network-doc-flow
+    command: npm run start
 
   postgres:
     container_name: doc-flow-postgres
@@ -27,7 +27,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-        - network-doc-flow
+      - network-doc-flow
 
   adminer:
     container_name: doc-flow-adminer
@@ -35,6 +35,20 @@ services:
     restart: always
     ports:
       - 8081:8080
+
+  migrate:
+    container_name: doc-flow-migrate
+    image: node:20.18-bullseye-slim
+    working_dir: /var/www/app
+    volumes:
+      - ./:/var/www/app
+    networks:
+      - network-doc-flow
+    command: [ 
+      "npm",
+      "run",
+      "migrate:up"
+    ]
 
 networks:
   network-doc-flow:

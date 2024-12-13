@@ -57,12 +57,17 @@ export class File extends Model {
     allowNull: false,
   })
   event_id: string;
+  @Column({
+    type: DataType.DATE,
+    defaultValue: DataType.NOW(),
+  })
   created_at: Date;
   @Column({
     type: DataType.DATE,
     defaultValue: DataType.NOW(),
   })
   updated_at: Date;
+
   @BelongsTo(() => User, 'user_id')
   user: User;
   @BelongsTo(() => Event, 'event_id')

@@ -6,7 +6,6 @@ import {
   BelongsToMany,
 } from 'sequelize-typescript';
 import { Profile } from 'src/profile/entities/profile.entity';
-
 @Table({
   tableName: 'roles',
   timestamps: false,

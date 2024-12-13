@@ -14,6 +14,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ProfileGuard } from './profile/profile.guard';
+import { RolesGuard } from './roles/roles.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -59,6 +60,10 @@ import { ProfileGuard } from './profile/profile.guard';
     {
       provide: APP_GUARD,
       useClass: ProfileGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
     }
   ],
 })

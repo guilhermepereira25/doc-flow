@@ -10,7 +10,7 @@ import { Event } from 'src/events/entities/event.entity';
 import { File } from 'src/files/entities/file.entity';
 
 @Table({
-  tableName: 'files',
+  tableName: 'certificates',
   timestamps: false,
 })
 export class Certificate extends Model {

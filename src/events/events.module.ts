@@ -4,6 +4,7 @@ import { EventsController } from './events.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Event } from './entities/event.entity';
 import { EventRepositoryImpl } from './repositories/event.repository';
+import { EventCronService } from './events-cron.service';
 @Module({
   imports: [SequelizeModule.forFeature([Event])],
   controllers: [
@@ -14,8 +15,9 @@ import { EventRepositoryImpl } from './repositories/event.repository';
     {
       provide: 'IEventRepository',
       useClass: EventRepositoryImpl,
-    }
+    },
+    EventCronService
   ],
-  exports: [EventsService],
+  exports: [EventsService, EventCronService],
 })
 export class EventsModule {}

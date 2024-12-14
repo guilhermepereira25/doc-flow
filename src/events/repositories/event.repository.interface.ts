@@ -10,4 +10,7 @@ export interface EventRepository {
   remove(id: string): Promise<void>;
   findEventByName(name: string): Promise<Event>;
   findOrCreateEvent(name: string): Promise<[Event, boolean]>;
+  endEvent(id: string): Promise<null | Event>;
+  getStartedEvents(): Promise<Event[]>;
+  getEndedEvents(): Promise<Event[]>;
 }

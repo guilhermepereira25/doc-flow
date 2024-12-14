@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Res,
+  BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -32,13 +34,16 @@ export class EventsController {
   async create(@Res() res: Response, @Body() createEventDto: CreateEventDto) {
     try {
       const event = await this.eventsService.create(createEventDto);
-      if (!event) {
-        return res.status(409).json({ message: 'Event already exists' });
-      }
       return res.status(201).json(event);
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.APP_ENV === 'development') {
         console.error(err);
+      }
+      if (err instanceof ConflictException) {
+        return res.status(409).json({ message: err.message });
+      }
+      if (err instanceof BadRequestException) {
+        return res.status(400).json(err.getResponse());
       }
       return res.status(500).json({ message: 'Internal server error' });
     }
@@ -83,8 +88,19 @@ export class EventsController {
     type: Event,
   })
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.eventsService.findOne(id);
+  async findOne(@Res() res: Response, @Param('id') id: string) {
+    try {
+      const [event, isStarted, isEnded] = await this.eventsService.findOne(id);
+      if (!event) {
+        return res.status(404).json({ message: 'Event not found' });
+      }
+      return res.status(200).json({ event, isStarted, isEnded });
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res.status(500).json({ message: 'Internal server error' });
+    }
   }
 
   @Profiles(Profile.Admin, Profile.Professor)
@@ -97,5 +113,23 @@ export class EventsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eventsService.remove(id);
+  }
+
+  @ApiOperation({ summary: 'End an event' })
+  @ApiResponse({
+    status: 200,
+    description: 'End an event',
+  })
+  @Post('end/:id')
+  async endEvent(@Res() res: Response, @Param('id') id: string) {
+    try {
+      await this.eventsService.endEvent(id);
+      return res.status(200).json({ message: 'Event ended' });
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res.status(500).json({ message: 'Internal server error' });
+    }
   }
 }

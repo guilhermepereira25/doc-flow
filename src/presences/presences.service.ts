@@ -23,16 +23,23 @@ export class PresencesService {
     if (!user) {
       throw new Error('User not found');
     }
-    const event = await this.eventService.findOne(createPresenceDto.event_id);
+
+    const [event, isStarted, isEnded] = await this.eventService.findOne(
+      createPresenceDto.event_id,
+    );
     if (!event) {
       throw new Error('Event not found');
     }
+    if (!isStarted || isEnded) {
+      throw new Error('Event is not started or already ended');
+    }
+
     const [presence, created] =
       await this.presenceRepository.findOrCreatedPresence(
         userId,
         createPresenceDto.event_id,
       );
-    if (created) {
+    if (!created) {
       return null;
     }
     return presence;

@@ -36,4 +36,11 @@ export abstract class CronService {
       'utf-8',
     );
   }
+
+  protected async closeLogFile(): Promise<void> {
+    if (!this.logFile) {
+      throw new Error('Log file not initialized');
+    }
+    await this.logFile?.close();
+  }
 }

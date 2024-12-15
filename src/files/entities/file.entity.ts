@@ -7,14 +7,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from 'src/users/entities/user.entity';
 import { Event } from 'src/events/entities/event.entity';
-
-enum FileType {
-  PDF = 'pdf',
-  IMAGE = 'image',
-  VIDEO = 'video',
-  DOCUMENT = 'document',
-  CERTIFICATE = 'certificate',
-}
+import { FileType } from '../files.enum';
 
 @Table({
   tableName: 'files',

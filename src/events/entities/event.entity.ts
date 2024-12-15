@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import { Presence } from 'src/presences/entities/presence.entity';
+import { File } from 'src/files/entities/file.entity';
 
 @Table({
   tableName: 'events',
@@ -49,4 +50,7 @@ export class Event extends Model {
 
   @HasMany(() => Presence, 'event_id')
   presences: Presence[];
+
+  @HasMany(() => File, 'event_id')
+  files: File[];
 }

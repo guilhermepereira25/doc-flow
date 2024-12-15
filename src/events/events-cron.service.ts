@@ -17,7 +17,7 @@ export class EventCronService extends CronService {
     await this.writeLog('Iniciando a verificação de eventos pendentes.');
 
     try {
-      const pendingEvents = await this.eventService.getStartedEvents();
+      const pendingEvents = await this.eventService.getUpcomingEvents();
       if (pendingEvents.length === 0) {
         await this.writeLog('Nenhum evento pendente.');
         return;
@@ -28,11 +28,10 @@ export class EventCronService extends CronService {
       }
     } catch (err) {
       await this.writeLog(`Erro ao iniciar eventos: ${err.message}`);
+    } finally {
+      await this.writeLog('Verificação de eventos pendentes finalizada.');
+      await this.closeLogFile();
     }
-
-    await this.writeLog('Verificação de eventos pendentes finalizada.');
-
-    await this.closeLogFile();
   }
 
   @Cron('0 */10 * * * *')
@@ -42,12 +41,12 @@ export class EventCronService extends CronService {
     await this.writeLog('Iniciando a verificação de eventos iniciados.');
 
     try {
-      const startedEvents = await this.eventService.getStartedEvents();
-      if (startedEvents.length === 0) {
+      const eventsToEnded = await this.eventService.getEndedEvents();
+      if (eventsToEnded.length === 0) {
         await this.writeLog('Nenhum evento iniciado.');
         return;
       }
-      for (const event of startedEvents) {
+      for (const event of eventsToEnded) {
         await this.eventService.endEvent(event.id);
         await this.writeLog(`Evento ${event.name} finalizado com sucesso.`);
       }

@@ -82,8 +82,12 @@ export class EventsService {
     return await this.eventRepository.endEvent(id);
   }
 
-  async getStartedEvents(): Promise<Event[]> {
-    return await this.eventRepository.getStartedEvents();
+  async getUpcomingEvents(): Promise<Event[]> {
+    return await this.eventRepository.getUpcomingEvents();
+  }
+
+  async getEndedEvents(): Promise<Event[]> {
+    return await this.eventRepository.getEndedEvents();
   }
 
   async startEvent(id: string): Promise<Event> {

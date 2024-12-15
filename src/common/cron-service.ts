@@ -42,5 +42,6 @@ export abstract class CronService {
       throw new Error('Log file not initialized');
     }
     await this.logFile?.close();
+    this.logFile = null;
   }
 }

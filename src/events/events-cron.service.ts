@@ -22,10 +22,13 @@ export class EventCronService extends CronService {
         await this.writeLog('Nenhum evento pendente.');
         return;
       }
-      for (const event of pendingEvents) {
-        await this.eventService.startEvent(event.id);
-        await this.writeLog(`Evento ${event.name} iniciado com sucesso.`);
-      }
+
+      await Promise.all(
+        pendingEvents.map(async (event) => {
+          await this.eventService.startEvent(event.id);
+          await this.writeLog(`Evento ${event.name} iniciado com sucesso.`);
+        }),
+      );
     } catch (err) {
       await this.writeLog(`Erro ao iniciar eventos: ${err.message}`);
     } finally {
@@ -46,10 +49,12 @@ export class EventCronService extends CronService {
         await this.writeLog('Nenhum evento iniciado.');
         return;
       }
-      for (const event of eventsToEnded) {
-        await this.eventService.endEvent(event.id);
-        await this.writeLog(`Evento ${event.name} finalizado com sucesso.`);
-      }
+      await Promise.all(
+        eventsToEnded.map(async (event) => {
+          await this.eventService.endEvent(event.id);
+          await this.writeLog(`Evento ${event.name} finalizado com sucesso.`);
+        }),
+      );
     } catch (err) {
       await this.writeLog(`Erro ao finalizar eventos: ${err.message}`);
     } finally {

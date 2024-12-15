@@ -18,37 +18,30 @@ module.exports = {
       'certificates',
     ];
     for (const table of tables) {
-      await queryInterface.changeColumn(table, 'id', {
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-        primaryKey: true,
-      });
+      console.debug(`Changing primary key to UUID on table ${table}`);
+      await queryInterface.sequelize.query(
+        `ALTER TABLE ${table} ALTER COLUMN id TYPE uuid USING id::uuid::uuid;`,
+      );
     }
 
-    await queryInterface.changeColumn('profiles_role', 'profile_id', {
-      type: Sequelize.UUID,
-      allowNull: false,
-      primaryKey: true,
-    });
-    await queryInterface.changeColumn('profiles_role', 'role_id', {
-      type: Sequelize.UUID,
-      allowNull: false,
-      primaryKey: true,
-    });
+    await queryInterface.sequelize.query(
+      'ALTER TABLE profiles_roles ALTER COLUMN profile_id TYPE uuid USING profile_id::uuid::uuid;',
+    );
+    await queryInterface.sequelize.query(
+      'ALTER TABLE profiles_roles ALTER COLUMN role_id TYPE uuid USING role_id::uuid::uuid;',
+    );
 
-    await queryInterface.changeColumn('certificates', 'event_id', {
-      type: Sequelize.UUID,
-      allowNull: false,
-    });
-    await queryInterface.changeColumn('certificates', 'user_id', {
-      type: Sequelize.UUID,
-      allowNull: false,
-    });
-    await queryInterface.changeColumn('certificates', 'file_id', {
-      type: Sequelize.UUID,
-      allowNull: false,
-    });
+    await queryInterface.sequelize.query(
+      'ALTER TABLE certificates ALTER COLUMN event_id TYPE uuid USING event_id::uuid::uuid;',
+    );
+
+    await queryInterface.sequelize.query(
+      'ALTER TABLE certificates ALTER COLUMN user_id TYPE uuid USING user_id::uuid::uuid;',
+    );
+
+    await queryInterface.sequelize.query(
+      'ALTER TABLE certificates ALTER COLUMN file_id TYPE uuid USING file_id::uuid::uuid;',
+    );
   },
 
   async down (queryInterface, Sequelize) {

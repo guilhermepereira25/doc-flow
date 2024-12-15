@@ -51,6 +51,8 @@ export class EventCronService extends CronService {
       }
     } catch (err) {
       await this.writeLog(`Erro ao finalizar eventos: ${err.message}`);
+    } finally {
+      await this.writeLog('Verificação de eventos iniciados finalizada.');
     }
   }
 }

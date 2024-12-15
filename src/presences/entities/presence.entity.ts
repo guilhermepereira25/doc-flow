@@ -23,7 +23,7 @@ export class Presence extends Model {
     primaryKey: true,
     defaultValue: DataType.UUIDV4,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
@@ -33,7 +33,7 @@ export class Presence extends Model {
     type: DataType.UUID,
     allowNull: false,
   })
-  user_id: number;
+  user_id: string;
 
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
@@ -43,7 +43,7 @@ export class Presence extends Model {
     type: DataType.UUID,
     allowNull: false,
   })
-  event_id: number;
+  event_id: string;
 
   @ApiProperty({
     example: '2021-01-01T00:00:00.000Z',

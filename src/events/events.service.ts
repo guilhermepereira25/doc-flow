@@ -66,7 +66,8 @@ export class EventsService {
     }
     const now = new Date();
     const isStarted: boolean = this.eventStarted(event.start_at, now);
-    const isEnded: boolean = this.eventEnded(event.end_at, now);
+    const isEnded: boolean =
+      event.end_at === null ? false : this.eventEnded(event.end_at, now);
     return [event, isStarted, isEnded];
   }
 

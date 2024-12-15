@@ -11,6 +11,6 @@ export interface EventRepository {
   findEventByName(name: string): Promise<Event>;
   findOrCreateEvent(name: string): Promise<[Event, boolean]>;
   endEvent(id: string): Promise<null | Event>;
-  getStartedEvents(): Promise<Event[]>;
+  getUpcomingEvents(): Promise<Event[]>;
   getEndedEvents(): Promise<Event[]>;
 }

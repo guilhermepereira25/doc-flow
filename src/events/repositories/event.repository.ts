@@ -62,7 +62,7 @@ export class EventRepositoryImpl implements EventRepository {
     });
   }
 
-  async getStartedEvents(): Promise<Event[]> {
+  async getUpcomingEvents(): Promise<Event[]> {
     return await this.eventModel.scope('withoutTimestamps').findAll({
       where: {
         status: EventStatus.STATUS_UPCOMING,

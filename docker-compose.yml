@@ -52,6 +52,20 @@ services:
       "migrate:up"
     ]
 
+  migrate:
+    container_name: doc-flow-migrate
+    image: node:20.18-bullseye-slim
+    working_dir: /var/www/app
+    volumes:
+      - ./:/var/www/app
+    networks:
+      - network-doc-flow
+    command: [ 
+      "npm",
+      "run",
+      "migrate:up"
+    ]
+
 networks:
   network-doc-flow:
     driver: bridge

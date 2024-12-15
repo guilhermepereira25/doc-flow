@@ -30,7 +30,6 @@ export class EventCronService extends CronService {
       await this.writeLog(`Erro ao iniciar eventos: ${err.message}`);
     } finally {
       await this.writeLog('Verificação de eventos pendentes finalizada.');
-      await this.closeLogFile();
     }
   }
 

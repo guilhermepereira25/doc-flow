@@ -65,8 +65,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard
-    }
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}

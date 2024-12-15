@@ -8,18 +8,14 @@ import { EventsModule } from '../events/events.module';
 import { PresenceRepositoryImpl } from './repositories/presence.repository';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([Presence]), 
-    UsersModule, 
-    EventsModule
-  ],
+  imports: [SequelizeModule.forFeature([Presence]), UsersModule, EventsModule],
   controllers: [PresencesController],
   providers: [
-    PresencesService, 
+    PresencesService,
     {
-      'provide': 'IPresenceRepository',
-      'useClass': PresenceRepositoryImpl
-    }
+      provide: 'IPresenceRepository',
+      useClass: PresenceRepositoryImpl,
+    },
   ],
 })
 export class PresencesModule {}

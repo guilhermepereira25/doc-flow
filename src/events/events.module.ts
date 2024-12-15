@@ -7,16 +7,14 @@ import { EventRepositoryImpl } from './repositories/event.repository';
 import { EventCronService } from './events-cron.service';
 @Module({
   imports: [SequelizeModule.forFeature([Event])],
-  controllers: [
-    EventsController, 
-  ],
+  controllers: [EventsController],
   providers: [
     EventsService,
     {
       provide: 'IEventRepository',
       useClass: EventRepositoryImpl,
     },
-    EventCronService
+    EventCronService,
   ],
   exports: [EventsService, EventCronService],
 })

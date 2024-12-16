@@ -32,9 +32,9 @@ export class CertificateRepositoryImpl implements CertificateRepository {
 
   async update(
     id: string,
-    updateProfileDto: CreateCertificateDto,
+    updateCertificadoDto: CreateCertificateDto,
   ): Promise<string> {
-    await this.certificateModel.update(updateProfileDto, {
+    await this.certificateModel.update(updateCertificadoDto, {
       where: {
         id,
       },

@@ -9,7 +9,8 @@ import {
 } from 'sequelize-typescript';
 import { Presence } from 'src/presences/entities/presence.entity';
 import { EventStatus } from '../enum/event-status.enum';
-
+import { File } from 'src/files/entities/file.entity';
+import { Certificate } from 'src/certificates/entities/certificate.entity';
 @Scopes(() => ({
   withoutTimestamps: {
     attributes: {
@@ -90,4 +91,10 @@ export class Event extends Model {
 
   @HasMany(() => Presence, 'event_id')
   presences: Presence[];
+
+  @HasMany(() => File, 'event_id')
+  files: File[];
+
+  @HasMany(() => Certificate, 'event_id')
+  certificates: Certificate[];
 }

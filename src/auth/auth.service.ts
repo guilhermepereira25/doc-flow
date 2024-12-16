@@ -36,7 +36,7 @@ export class AuthService {
     return await this.jwtService.signAsync(payload);
   }
 
-  private async hashPassword(password: string) {
+  private async hashPassword(password: string): Promise<string> {
     return await hash(password, 10);
   }
 

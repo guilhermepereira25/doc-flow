@@ -1,18 +1,105 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
+import { UsersService } from 'src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import { SignInAuthDto } from './dto/signin-auth.dto';
+import { SignUpAuthDto } from './dto/singup-auth.dto';
+import { User } from 'src/users/entities/user.entity';
+import * as bcrypt from 'bcrypt';
+
+jest.mock('bcrypt');
 
 describe('AuthService', () => {
   let service: AuthService;
+  let usersService: UsersService;
+  const userData: User = {
+    id: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
+    username: 'test',
+    password: 'hashedPassword',
+    profile: {
+      id: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
+      name: 'user',
+    },
+  } as User;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
+      providers: [
+        AuthService,
+        {
+          provide: UsersService,
+          useValue: {
+            findByUsername: jest.fn(() => Promise.resolve(userData)),
+            create: jest.fn(() => Promise.resolve(userData)),
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            signAsync: jest.fn(() => Promise.resolve('token')),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
+    usersService = module.get<UsersService>(UsersService);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('signIn', () => {
+    it('should return access token if credentials are valid', async () => {
+      const signInDto: SignInAuthDto = { username: 'test', password: 'test' };
+
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(userData);
+
+      const result = await service.signIn(signInDto);
+      expect(result).toEqual({ access_token: 'token' });
+    });
+
+    it('should return null if credentials are invalid', async () => {
+      const signInDto: SignInAuthDto = { username: 'test', password: 'test' };
+
+      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(userData);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      const result = await service.signIn(signInDto);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('signUp', () => {
+    it('should throw an error if user already exists', async () => {
+      const signUpDto: SignUpAuthDto = {
+        username: 'test',
+        password: 'test',
+        profileId: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
+      };
+
+      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(userData);
+
+      await expect(service.signUp(signUpDto)).rejects.toThrow(
+        'User already exists',
+      );
+    });
+
+    it('should return access token if user is created successfully', async () => {
+      const signUpDto: SignUpAuthDto = {
+        username: 'test',
+        password: 'test',
+        profileId: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
+      };
+
+      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(null);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
+      jest.spyOn(usersService, 'create').mockResolvedValue(userData);
+
+      const result = await service.signUp(signUpDto);
+      expect(result).toEqual({ access_token: 'token' });
+    });
   });
 });

@@ -50,7 +50,7 @@ export class EventsService {
     return await this.eventRepository.create({
       name: createEventDto.name,
       eventStartDate: eventStartDate.toISOString(),
-      eventEndDate: eventEndDate.toISOString(),
+      eventEndDate: eventEndDate?.toISOString() || null,
       status: createEventDto.status,
     });
   }
@@ -98,19 +98,17 @@ export class EventsService {
   }
 
   private isValidEventEndDate(eventEndDate: Date, now: Date): boolean {
-    const datePlusThenMinutes = new Date(now.getMinutes() + 10);
-    if (eventEndDate < datePlusThenMinutes) {
-      return false;
+    const datePlusThenMinutes = new Date(now);
+    datePlusThenMinutes.setMinutes(datePlusThenMinutes.getMinutes() + 10);
+    if (eventEndDate > datePlusThenMinutes) {
+      return true;
     }
-    if (eventEndDate < now) {
-      return false;
-    }
-    return true;
+    return false;
   }
 
   private isValidEventStatusForEventDates(
     eventStartDate: Date,
-    eventEndDate: Date,
+    eventEndDate: Date | null,
     now: Date,
     status: EventStatus,
   ): [boolean, string | null] {
@@ -123,10 +121,15 @@ export class EventsService {
         'Event start date is in the future, status must be upcoming',
       ];
     }
-    if (eventStartDate < now && eventEndDate < now) {
+    if (
+      eventStartDate < now &&
+      eventEndDate !== null &&
+      eventEndDate < now &&
+      status !== EventStatus.STATUS_ENDED
+    ) {
       return [
         false,
-        'Event start date and end date are in the past, status must be',
+        'Event start date and end date are in the past, status must be ended',
       ];
     }
     return [true, null];

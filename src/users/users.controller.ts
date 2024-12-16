@@ -62,6 +62,7 @@ export class UsersController {
             profile_id: '550e8400-e29b-41d4-a716-446655440001',
           },
         ],
+        page: 1,
       },
     },
   })
@@ -70,7 +71,7 @@ export class UsersController {
     try {
       page = page > 0 ? page : 1;
       const users = await this.usersService.findAll(page);
-      return res.status(200).json({ users });
+      return res.status(200).json({ users, page });
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);

@@ -13,7 +13,7 @@ import { RoleRepositoryImpl } from './repositories/role.repository';
     {
       provide: 'IRoleRepository',
       useClass: RoleRepositoryImpl,
-    }
+    },
   ],
 })
 export class RolesModule {}

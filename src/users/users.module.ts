@@ -7,16 +7,13 @@ import { UserRepositoryImpl } from './repositories/user.repository';
 import { USER_REPOSITORY } from './repositories/user-repository.token';
 import { ProfileModule } from '../profile/profile.module';
 @Module({
-  imports: [
-    SequelizeModule.forFeature([User]), 
-    ProfileModule
-  ],
+  imports: [SequelizeModule.forFeature([User]), ProfileModule],
   controllers: [UsersController],
   providers: [
     UsersService,
     {
       provide: USER_REPOSITORY,
-      useClass: UserRepositoryImpl
+      useClass: UserRepositoryImpl,
     },
   ],
   exports: [UsersService],

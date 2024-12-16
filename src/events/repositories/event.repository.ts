@@ -3,6 +3,8 @@ import { EventRepository } from './event.repository.interface';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
 import { Event } from '../entities/event.entity';
+import { EventStatus } from '../enum/event-status.enum';
+import { Op } from 'sequelize';
 
 export class EventRepositoryImpl implements EventRepository {
   constructor(
@@ -11,13 +13,16 @@ export class EventRepositoryImpl implements EventRepository {
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
-    return await this.eventModel.create({
-      ...createEventDto,
+    return await this.eventModel.scope('withoutTimestamps').create({
+      name: createEventDto.name,
+      start_at: createEventDto.eventStartDate,
+      end_at: createEventDto.eventEndDate,
+      status: createEventDto.status,
     });
   }
 
   async findAll(): Promise<Event[]> {
-    return await this.eventModel.findAll();
+    return await this.eventModel.scope('withoutTimestamps').findAll();
   }
 
   async findOne(id: string): Promise<Event> {
@@ -42,6 +47,42 @@ export class EventRepositoryImpl implements EventRepository {
     return await this.eventModel.findOrCreate({
       where: {
         name,
+      },
+    });
+  }
+
+  async endEvent(id: string): Promise<Event | null> {
+    const event = await this.findOne(id);
+    if (!event) {
+      return null;
+    }
+    return await event.update({
+      end_at: new Date(),
+      status: EventStatus.STATUS_ENDED,
+    });
+  }
+
+  async getUpcomingEvents(): Promise<Event[]> {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      where: {
+        status: EventStatus.STATUS_UPCOMING,
+        start_at: {
+          [Op.lte]: new Date(),
+        },
+        end_at: {
+          [Op.eq]: null,
+        },
+      },
+    });
+  }
+
+  async getEndedEvents(): Promise<Event[]> {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      where: {
+        status: EventStatus.STATUS_STARTED,
+        end_at: {
+          [Op.lte]: new Date(),
+        },
       },
     });
   }

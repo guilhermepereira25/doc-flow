@@ -9,11 +9,11 @@ import { PROFILE_REPOSITORY } from './repositories/profile-repository.token';
   imports: [SequelizeModule.forFeature([Profile])],
   controllers: [ProfileController],
   providers: [
-    ProfileService, 
+    ProfileService,
     {
-      provide: PROFILE_REPOSITORY, 
+      provide: PROFILE_REPOSITORY,
       useClass: ProfileRepositoryImpl,
-    }
+    },
   ],
   exports: [ProfileService],
 })

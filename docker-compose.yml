@@ -26,6 +26,7 @@ services:
       - ./.env
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
     networks:
       - network-doc-flow
 
@@ -35,6 +36,8 @@ services:
     restart: always
     ports:
       - 8081:8080
+    networks:
+      - network-doc-flow
 
   migrate:
     container_name: doc-flow-migrate
@@ -44,10 +47,29 @@ services:
       - ./:/var/www/app
     networks:
       - network-doc-flow
+    depends_on:
+      - postgres
     command: [ 
       "npm",
       "run",
       "migrate:up"
+    ]
+
+  seed:
+    container_name: doc-flow-seed
+    image: node:20.18-bullseye-slim
+    working_dir: /var/www/app
+    volumes:
+      - ./:/var/www/app
+    networks:
+      - network-doc-flow
+    depends_on:
+      - migrate
+      - postgres
+    command: [ 
+      "npm",
+      "run",
+      "seed:up"
     ]
 
 networks:

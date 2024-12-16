@@ -12,54 +12,79 @@ export class EventCronService extends CronService {
   // Executa a cada 5 minutos
   @Cron('0 */5 * * * *')
   async handleUpcomingToCheckIfEventsHasStarted() {
-    await this.initLogFile('handleUpcomingToCheckIfEventsHasStarted');
+    const logFile = await this.initLogFile(
+      'handleUpcomingToCheckIfEventsHasStarted',
+    );
 
-    await this.writeLog('Iniciando a verificação de eventos pendentes.');
+    await this.writeLog(
+      logFile,
+      'Iniciando a verificação de eventos pendentes.',
+    );
 
     try {
       const pendingEvents = await this.eventService.getUpcomingEvents();
       if (pendingEvents.length === 0) {
-        await this.writeLog('Nenhum evento pendente.');
+        await this.writeLog(logFile, 'Nenhum evento pendente.');
         return;
       }
 
       await Promise.all(
         pendingEvents.map(async (event) => {
           await this.eventService.startEvent(event.id);
-          await this.writeLog(`Evento ${event.name} iniciado com sucesso.`);
+          await this.writeLog(
+            logFile,
+            `Evento ${event.name} iniciado com sucesso.`,
+          );
         }),
       );
     } catch (err) {
-      await this.writeLog(`Erro ao iniciar eventos: ${err.message}`);
+      await this.writeLog(logFile, `Erro ao iniciar eventos: ${err.message}`);
     } finally {
-      await this.writeLog('Verificação de eventos pendentes finalizada.');
-      await this.closeLogFile();
+      await this.writeLog(
+        logFile,
+        'Verificação de eventos pendentes finalizada.',
+      );
+      await logFile?.close();
     }
   }
 
   @Cron('0 */5 * * * *')
   async handleStartedToCheckIfEventsHasEnded() {
-    await this.initLogFile('handleStartedToCheckIfEventsHasEnded');
+    const fileHandler = await this.initLogFile(
+      'handleStartedToCheckIfEventsHasEnded',
+    );
 
-    await this.writeLog('Iniciando a verificação de eventos iniciados.');
+    await this.writeLog(
+      fileHandler,
+      'Iniciando a verificação de eventos iniciados.',
+    );
 
     try {
       const eventsToEnded = await this.eventService.getEndedEvents();
       if (eventsToEnded.length === 0) {
-        await this.writeLog('Nenhum evento iniciado.');
+        await this.writeLog(fileHandler, 'Nenhum evento iniciado.');
         return;
       }
       await Promise.all(
         eventsToEnded.map(async (event) => {
           await this.eventService.endEvent(event.id);
-          await this.writeLog(`Evento ${event.name} finalizado com sucesso.`);
+          await this.writeLog(
+            fileHandler,
+            `Evento ${event.name} finalizado com sucesso.`,
+          );
         }),
       );
     } catch (err) {
-      await this.writeLog(`Erro ao finalizar eventos: ${err.message}`);
+      await this.writeLog(
+        fileHandler,
+        `Erro ao finalizar eventos: ${err.message}`,
+      );
     } finally {
-      await this.writeLog('Verificação de eventos iniciados finalizada.');
-      await this.closeLogFile();
+      await this.writeLog(
+        fileHandler,
+        'Verificação de eventos iniciados finalizada.',
+      );
+      await fileHandler?.close();
     }
   }
 }

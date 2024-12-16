@@ -13,6 +13,9 @@ export class FilesService {
     private readonly fileRepository: FileRepository,
   ) {}
 
+  //TODO: esse endpoint precisa de refactory, só deveria criar um registro relacionando user_id e event_id com o arquivo
+  // e não salvar o arquivo em si, deveria ter um endpoint /upload
+  // poderia até ser um pedido (enfileirar) para o serviço de upload
   async create(file: Express.Multer.File, req: Request) {
     const arquivo = new CreateFileDto();
     arquivo.name = file.filename;
@@ -43,11 +46,13 @@ export class FilesService {
       arquivo.type = FileType.VIDEO;
     }
 
-    arquivo.url = `${req.protocol}://${req.get('host')}/files/${file.filename}`;
-    if (!req.body.userId || !req.body.userId) {
+    arquivo.url = file.path;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    arquivo.userId = req.user?.sub;
+    if (!arquivo.userId || !req.body.userId) {
       return null;
     }
-    arquivo.userId = req.body.userId;
     arquivo.eventId = req.body.eventId;
 
     return await this.fileRepository.create(arquivo);

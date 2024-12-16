@@ -1,9 +1,7 @@
-import { FileHandle, writeFile, open } from 'node:fs/promises';
+import { FileHandle, open } from 'node:fs/promises';
 import * as path from 'path';
 
 export abstract class CronService {
-  protected logFile: FileHandle;
-
   constructor(protected cronName: string) {
     this.cronName = cronName;
   }
@@ -18,30 +16,22 @@ export abstract class CronService {
     );
   }
 
-  protected async initLogFile(cronJobName: string): Promise<void> {
+  protected async initLogFile(cronJobName: string): Promise<FileHandle> {
     const fileName = this.getFileName(cronJobName);
-    this.logFile = await open(
+    return await open(
       path.resolve(__dirname, '../../', 'log/cron/', fileName),
       'a',
     );
   }
 
-  protected async writeLog(message: string): Promise<void> {
-    if (!this.logFile) {
-      throw new Error('Log file not initialized');
+  protected async writeLog(
+    logFile: FileHandle,
+    message: string,
+  ): Promise<void> {
+    if (logFile) {
+      await logFile.write(
+        `${new Date().toISOString()} - ${this.cronName}: ${message}\n`,
+      );
     }
-    await writeFile(
-      this.logFile,
-      `${new Date().toISOString()} - ${message}\n`,
-      'utf-8',
-    );
-  }
-
-  protected async closeLogFile(): Promise<void> {
-    if (!this.logFile) {
-      throw new Error('Log file not initialized');
-    }
-    await this.logFile?.close();
-    this.logFile = null;
   }
 }

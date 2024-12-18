@@ -4,10 +4,12 @@ import {
   Table,
   DataType,
   BelongsTo,
+  AfterCreate,
 } from 'sequelize-typescript';
 import { User } from 'src/users/entities/user.entity';
 import { Event } from 'src/events/entities/event.entity';
-import { FileType } from '../files.enum';
+import { FileType } from '../enum/file-type.enum';
+import { FileStatus } from '../enum/file-status.enum';
 
 @Table({
   tableName: 'files',
@@ -21,40 +23,47 @@ export class File extends Model {
     defaultValue: DataType.UUIDV4,
   })
   id: string;
+
   @Column({
     type: DataType.STRING(30),
     allowNull: false,
   })
   name: string;
+
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
-  url: string;
+  path: string;
   @Column({
     type: DataType.ENUM(...Object.values(FileType)),
     allowNull: false,
   })
   type: FileType;
-  @Column({
-    type: DataType.DATE,
-    defaultValue: DataType.NOW(),
-  })
+
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
   user_id: string;
+
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
   event_id: string;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(FileStatus)),
+    defaultValue: FileStatus.STATUS_WAITING,
+  })
+  status: FileStatus;
+
   @Column({
     type: DataType.DATE,
     defaultValue: DataType.NOW(),
   })
   created_at: Date;
+
   @Column({
     type: DataType.DATE,
     defaultValue: DataType.NOW(),
@@ -65,4 +74,10 @@ export class File extends Model {
   user: User;
   @BelongsTo(() => Event, 'event_id')
   event: Event;
+
+  @AfterCreate
+  static removeColumnAttributesAfterCreate(instance: File) {
+    delete instance.dataValues.created_at;
+    delete instance.dataValues.updated_at;
+  }
 }

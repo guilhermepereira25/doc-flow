@@ -1,26 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { FileType } from '../files.enum';
-import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { FileType } from '../enum/file-type.enum';
+import { IsNotEmpty, IsString, IsEnum, IsUUID } from 'class-validator';
 
 export class CreateFileDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  url: string;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsEnum(FileType)
   type: FileType;
+
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
-  @ApiProperty()
-  @IsString()
+  @IsUUID(4)
   @IsNotEmpty()
   eventId: string;
 }

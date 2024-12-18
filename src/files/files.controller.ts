@@ -11,6 +11,7 @@ import {
   Res,
   HttpStatus,
   Req,
+  ConflictException,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { UpdateFileDto } from './dto/update-file.dto';
@@ -51,6 +52,30 @@ export class FilesController {
       return res.status(201).json({
         file,
         message: 'File created successfully, you are able to upload it now',
+      });
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      if (err instanceof ConflictException) {
+        return res.status(409).json({ message: err.message });
+      }
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  @Get('status/:id')
+  async getStatus(@Param('id') id: string, @Res() res: Response) {
+    try {
+      const file = await this.filesService.findOne(id);
+      if (!file) {
+        return res.status(404).json({ message: 'File not found' });
+      }
+      return res.status(200).json({
+        file: {
+          id: file.id,
+          status: file.status,
+        },
       });
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
@@ -97,6 +122,9 @@ export class FilesController {
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
+      }
+      if (err instanceof ConflictException) {
+        return res.status(409).json({ message: err.message });
       }
       return res.status(500).json({ message: 'Internal server error' });
     }
@@ -192,11 +220,10 @@ export class FilesController {
   @Delete(':id')
   async remove(@Res() res: Response, @Param('id') id: string) {
     try {
-      const file = await this.filesService.remove(id);
-      if (!file) {
-        return res.status(404).json({ message: 'file not found' });
-      }
-      return res.status(200).json(file);
+      await this.filesService.remove(id);
+      return res.status(200).json({
+        message: 'File deleted successfully',
+      });
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);

@@ -11,10 +11,11 @@ export class FileRepositoryImpl implements FileRepository {
     private fileModel: typeof File,
   ) {}
 
-  async create(createFileDto: CreateFileDto): Promise<File> {
+  async create(createFileDto: CreateFileDto, userId: string): Promise<File> {
     return await this.fileModel.create({
-      ...createFileDto,
-      user_id: createFileDto.userId,
+      name: createFileDto.name,
+      type: createFileDto.type,
+      user_id: userId,
       event_id: createFileDto.eventId,
     });
   }
@@ -56,10 +57,37 @@ export class FileRepositoryImpl implements FileRepository {
       },
     });
   }
+
   async findByEventId(id: string): Promise<File[]> {
     return await this.fileModel.findAll({
       where: {
         event_id: id,
+      },
+    });
+  }
+
+  async findByUserIdAndEventId(
+    userId: string,
+    eventId: string,
+  ): Promise<File[]> {
+    return await this.fileModel.findAll({
+      where: {
+        user_id: userId,
+        event_id: eventId,
+      },
+    });
+  }
+
+  async findByUserIdAndEventIdAndType(
+    userId: string,
+    eventId: string,
+    type: string,
+  ): Promise<File[]> {
+    return await this.fileModel.findAll({
+      where: {
+        user_id: userId,
+        event_id: eventId,
+        type,
       },
     });
   }

@@ -5,9 +5,16 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { File } from './entities/file.entity';
 import { FILE_REPOSITORY } from './repository/files-repository.token';
 import { FileRepositoryImpl } from './repository/files.repository';
+import { BullModule } from '@nestjs/bull';
+import { FileProcessor } from './file.processor';
 
 @Module({
-  imports: [SequelizeModule.forFeature([File])],
+  imports: [
+    BullModule.registerQueue({
+      name: 'file',
+    }),
+    SequelizeModule.forFeature([File]),
+  ],
   controllers: [FilesController],
   providers: [
     FilesService,
@@ -15,6 +22,7 @@ import { FileRepositoryImpl } from './repository/files.repository';
       provide: FILE_REPOSITORY,
       useClass: FileRepositoryImpl,
     },
+    FileProcessor,
   ],
   exports: [FilesService],
 })

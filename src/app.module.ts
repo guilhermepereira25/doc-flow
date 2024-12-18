@@ -16,10 +16,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { ProfileGuard } from './profile/profile.guard';
 import { RolesGuard } from './roles/roles.guard';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BullModule } from '@nestjs/bull';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+      },
     }),
     ScheduleModule.forRoot(),
     SequelizeModule.forRoot({

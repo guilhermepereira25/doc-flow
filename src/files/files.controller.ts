@@ -8,46 +8,92 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
-  Req,
   Res,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
-//import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import multerConfig from './multer-config';
-import { Request } from 'express';
 import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as mime from 'mime-types';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { File } from './entities/file.entity';
+import { CreateFileDto } from './dto/create-file.dto';
+import { memoryStorage } from 'multer';
 
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @ApiOperation({ summary: 'Create a file' })
+  @ApiOperation({ summary: 'Create a file register in database' })
   @ApiResponse({
     status: 201,
     description: 'The record created',
     type: File,
   })
   @Post()
-  @UseInterceptors(FileInterceptor('arquivo', multerConfig))
   async create(
-    @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
+    @Body() fileCreateDto: CreateFileDto,
     @Res() res: Response,
   ) {
     try {
-      const fileRequest = await this.filesService.create(file, req);
-      if (!fileRequest) {
-        return res.status(404).json({ message: 'File not found' });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const userId: string = req.user?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
       }
-      return res.status(201).json(fileRequest);
+      const file: File = await this.filesService.create(fileCreateDto, userId);
+      return res.status(201).json({
+        file,
+        message: 'File created successfully, you are able to upload it now',
+      });
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  @Post('upload/:id')
+  @ApiOperation({
+    summary: 'Queue file to save on disk',
+  })
+  @ApiResponse({
+    status: 202,
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(pdf|doc|docx)$/)) {
+          return cb(new Error('File is not an document'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async uploadFile(
+    @UploadedFile()
+    file: Express.Multer.File,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    try {
+      if (!file) {
+        return res.status(400).json({ message: 'File not found' });
+      }
+      if (!isNaN(Number(id)) || id.length !== 36) {
+        return res.status(400).json({ message: 'Invalid id' });
+      }
+      await this.filesService.upload(file, id);
+      return res.status(202).json({ message: 'File enqueued to be processed' });
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
@@ -62,7 +108,7 @@ export class FilesController {
     description: 'Return all files',
     schema: {
       example: {
-        certificates: [
+        files: [
           {
             id: '550e8400-e29b-41d4-a716-446655440000',
             name: 'nomeArq.jpeg',

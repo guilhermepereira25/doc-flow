@@ -64,6 +64,19 @@ export class FilesController {
     }
   }
 
+  @ApiOperation({ summary: 'Get the status of a file' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the status of a file',
+    schema: {
+      example: {
+        file: {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          status: 'pending',
+        },
+      },
+    },
+  })
   @Get('status/:id')
   async getStatus(@Param('id') id: string, @Res() res: Response) {
     try {

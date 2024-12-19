@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { EventsService } from './events.service';
 import { CronService } from 'src/common/cron-service';
+import * as path from 'path';
+import { unlink, readdir } from 'fs/promises';
 
 @Injectable()
 export class EventCronService extends CronService {
+  private readonly logger = new Logger(EventCronService.name);
+
   constructor(private readonly eventService: EventsService) {
     super('EventCronService');
   }
@@ -85,6 +89,29 @@ export class EventCronService extends CronService {
         'Verificação de eventos iniciados finalizada.',
       );
       await fileHandler?.close();
+    }
+  }
+
+  @Cron('0 */10 * * * *')
+  async cleanup() {
+    this.logger.log('Cleaning up...');
+
+    const dirContents = await readdir(
+      path.resolve(__dirname, '../../', 'log/cron/'),
+    );
+    if (dirContents.length === 0) {
+      this.logger.log('Nothing to clean up.');
+      return;
+    }
+
+    try {
+      for (const file of dirContents) {
+        this.logger.log(`Removing file: ${file}`);
+        await unlink(path.resolve(__dirname, '../../', 'log/cron/', file));
+      }
+      this.logger.log('Clean up completed.');
+    } catch (err) {
+      this.logger.error(`Error cleaning up: ${err.message}`);
     }
   }
 }

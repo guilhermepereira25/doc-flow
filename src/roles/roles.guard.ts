@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from './decorators/roles.decorator';
+import { UserJwtPayload } from 'src';
+import { Role } from './entities/role.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -21,12 +23,16 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const user = request['user'];
+    const user: UserJwtPayload = request['user'];
     if (!user) {
       throw new UnauthorizedException();
     }
+    const roles: Role[] = user?.profile?.roles;
+    if (!roles) {
+      throw new ForbiddenException();
+    }
     const hasHole = requiredRoles.some((role: string) =>
-      user.profiles?.roles?.includes(role),
+      roles.some((r: Role) => r.name === role),
     );
     if (!hasHole) {
       throw new ForbiddenException();

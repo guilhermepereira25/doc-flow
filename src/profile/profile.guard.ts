@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PROFILES_KEY } from './decorators/profile.decorator';
+import { UserJwtPayload } from 'src';
 
 @Injectable()
 export class ProfileGuard implements CanActivate {
@@ -21,7 +22,7 @@ export class ProfileGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const user = request['user'];
+    const user: UserJwtPayload = request['user'];
     if (!user) {
       throw new UnauthorizedException();
     }

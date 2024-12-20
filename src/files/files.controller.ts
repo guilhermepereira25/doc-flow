@@ -9,7 +9,6 @@ import {
   UseInterceptors,
   UploadedFile,
   Res,
-  HttpStatus,
   Req,
   ConflictException,
 } from '@nestjs/common';
@@ -17,13 +16,11 @@ import { FilesService } from './files.service';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as mime from 'mime-types';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { File } from './entities/file.entity';
 import { CreateFileDto } from './dto/create-file.dto';
 import { memoryStorage } from 'multer';
+import { UserRequest } from 'src';
 
 @Controller('files')
 export class FilesController {
@@ -37,13 +34,11 @@ export class FilesController {
   })
   @Post()
   async create(
-    @Req() req: Request,
+    @Req() req: UserRequest,
     @Body() fileCreateDto: CreateFileDto,
     @Res() res: Response,
   ) {
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const userId: string = req.user?.sub;
       if (!userId) {
         return res.status(401).json({ message: 'Unauthorized' });
@@ -104,6 +99,11 @@ export class FilesController {
   })
   @ApiResponse({
     status: 202,
+    schema: {
+      example: {
+        message: 'File enqueued to be processed',
+      },
+    },
   })
   @UseInterceptors(
     FileInterceptor('file', {
@@ -208,21 +208,29 @@ export class FilesController {
     }
   }
 
-  @Get(':filename')
-  async getFile(@Param('filename') filename: string, @Res() res: Response) {
-    const filePath = path.join(__dirname, 'fileStorage', filename);
-    const fileExists = fs.existsSync(filePath);
-
-    if (!fileExists) {
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ message: 'File not found' });
+  @ApiOperation({ summary: 'Download a file' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the file',
+  })
+  @Get('download/:id')
+  async getFile(@Param('id') id: string, @Res() res: Response) {
+    try {
+      const filePath = await this.filesService.getFilePath(id);
+      res.download(filePath, (err) => {
+        if (err) {
+          if (process.env.APP_ENV === 'development') {
+            console.error(err);
+          }
+          res.status(500).json({ message: 'Internal server error' });
+        }
+      });
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res.status(500).json({ message: 'Internal server error' });
     }
-    const mimeType = mime.lookup(filename) || 'application/octet-stream';
-    const file = fs.createReadStream(filePath);
-    res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    file.pipe(res);
   }
 
   @Patch(':id')

@@ -14,6 +14,7 @@ import { Queue } from 'bull';
 import { FileToUpload } from './file-to-upload';
 import { unlink } from 'node:fs/promises';
 import { FileStatus } from './enum/file-status.enum';
+import { existsSync } from 'node:fs';
 
 @Injectable()
 export class FilesService {
@@ -96,6 +97,24 @@ export class FilesService {
       size: file.size,
     };
     await this.enqueueFileToSaveOnDisk(fileToUploadData);
+  }
+
+  async getFilePath(fileId: string): Promise<string> {
+    const fileData = await this.fileRepository.findOne(fileId);
+    if (!fileData) {
+      this.logger.error(`File not found for id ${fileId}`);
+      throw new Error('File not found');
+    }
+
+    const filePath = fileData.path;
+    const fileExists = existsSync(filePath);
+    if (!fileExists) {
+      this.logger.error(
+        `File not found on disk for id ${fileId} and path ${filePath}`,
+      );
+      throw new Error('File not found on disk');
+    }
+    return filePath;
   }
 
   private async enqueueFileToSaveOnDisk(file: FileToUpload): Promise<void> {

@@ -44,7 +44,7 @@ import { BullModule } from '@nestjs/bull';
           member.toLowerCase()
         );
       },
-    }),    
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_KEY,

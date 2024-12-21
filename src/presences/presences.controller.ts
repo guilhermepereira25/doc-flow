@@ -21,6 +21,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { Presence } from './entities/presence.entity';
+import { UserRequest } from 'src';
 
 @Controller('presences')
 export class PresencesController {
@@ -42,13 +43,11 @@ export class PresencesController {
   @Profiles(Profile.Student)
   @Post()
   async create(
-    @Req() req: Request,
+    @Req() req: UserRequest,
     @Res() res: Response,
     @Body() createPresenceDto: CreatePresenceDto,
   ) {
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const userId: string = req.user?.sub;
       if (!userId) {
         return res.status(401).json({ message: 'Unauthorized' });

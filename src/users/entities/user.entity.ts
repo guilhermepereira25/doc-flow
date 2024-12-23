@@ -11,8 +11,6 @@ import {
 import { File } from 'src/files/entities/file.entity';
 import { Presence } from 'src/presences/entities/presence.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
-import { Certificate } from 'src/certificates/entities/certificate.entity';
-
 @Scopes(() => ({
   excludePassword: {
     attributes: { exclude: ['password'] },
@@ -89,7 +87,4 @@ export class User extends Model {
 
   @HasMany(() => File, 'user_id')
   files: File[];
-
-  @HasMany(() => Certificate, 'user_id')
-  certificates: Certificate[];
 }

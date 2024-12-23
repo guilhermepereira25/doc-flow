@@ -3,15 +3,16 @@ name: 'doc-flow'
 services:
   app:
     container_name: doc-flow-backend
-    image: node:20.18-bullseye-slim
-    ports: 
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    ports:
       - "3000:3000"
-    working_dir: /var/www/app
-    volumes:
-      - ./:/var/www/app
     networks:
       - network-doc-flow
-    command: npm run start
+    depends_on:
+      - postgres
 
   postgres:
     container_name: doc-flow-postgres
@@ -41,35 +42,35 @@ services:
 
   migrate:
     container_name: doc-flow-migrate
-    image: node:20.18-bullseye-slim
-    working_dir: /var/www/app
-    volumes:
-      - ./:/var/www/app
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: db-actions-build
     networks:
       - network-doc-flow
     depends_on:
       - postgres
-    command: [ 
-      "npm",
-      "run",
-      "migrate:up"
+    command: [
+      "sh",
+      "-c",
+      "/var/www/app/database-actions.sh migrate"
     ]
 
   seed:
     container_name: doc-flow-seed
-    image: node:20.18-bullseye-slim
-    working_dir: /var/www/app
-    volumes:
-      - ./:/var/www/app
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: db-actions-build
     networks:
       - network-doc-flow
     depends_on:
       - migrate
       - postgres
-    command: [ 
-      "npm",
-      "run",
-      "seed:up"
+    command: [
+      "sh",
+      "-c",
+      "/var/www/app/database-actions.sh seed"
     ]
 
   redis:

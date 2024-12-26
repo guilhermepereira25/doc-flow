@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { EventsModule } from './events/events.module';
 import { RolesModule } from './roles/roles.module';
 import { FilesModule } from './files/files.module';
-import { CertificatesModule } from './certificates/certificates.module';
 import { PresencesModule } from './presences/presences.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
@@ -55,7 +54,6 @@ import { BullModule } from '@nestjs/bull';
     EventsModule,
     RolesModule,
     FilesModule,
-    CertificatesModule,
     PresencesModule,
     AuthModule,
   ],

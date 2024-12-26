@@ -17,6 +17,10 @@ import { ProfileGuard } from './profile/profile.guard';
 import { RolesGuard } from './roles/roles.guard';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
+import { TccModule } from './tcc/tcc.module';
+import { TccPresentationsModule } from './tcc_presentations/tcc_presentations.module';
+import { TccPresentationsModule } from './tcc-presentations/tcc-presentations.module';
+import { TccStudentsModule } from './tcc-students/tcc-students.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -58,6 +62,9 @@ import { BullModule } from '@nestjs/bull';
     CertificatesModule,
     PresencesModule,
     AuthModule,
+    TccModule,
+    TccPresentationsModule,
+    TccStudentsModule,
   ],
   controllers: [],
   providers: [

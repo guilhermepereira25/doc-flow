@@ -95,5 +95,5 @@ export class User extends Model {
   tccs: Tcc[];
 
   @BelongsToMany(() => TccStudents, 'tcc_students', 'student_id', 'tcc_id')
-  tcc_students: TccStudents[];
+  tcc: Tcc[];
 }

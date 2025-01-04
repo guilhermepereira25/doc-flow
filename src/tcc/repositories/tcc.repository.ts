@@ -14,7 +14,8 @@ export class TccRepositoryImpl implements TccRepository {
 
   async create(createTccDto: CreateTccDto): Promise<Tcc> {
     return await this.tccModel.create({
-      ...createTccDto,
+      theme: createTccDto.theme,
+      advisor_id: createTccDto.advisorId,
     });
   }
 
@@ -30,9 +31,9 @@ export class TccRepositoryImpl implements TccRepository {
     return tcc;
   }
 
-  async update(id: string, updateTccDto: UpdateTccDto): Promise<string> {
-    // Implement update logic here
-    return `This action updates a #${id} tcc`;
+  async update(id: string, updateTccDto: UpdateTccDto): Promise<Tcc> {
+    const tcc = await this.findOne(id);
+    return await tcc.update(updateTccDto);
   }
 
   async remove(id: string): Promise<number> {

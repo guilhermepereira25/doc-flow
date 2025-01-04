@@ -26,7 +26,7 @@ export class Tcc extends Model {
     type: DataType.STRING(50),
     allowNull: false,
   })
-  name: string;
+  theme: string;
 
   @Column({
     type: DataType.UUIDV4,
@@ -52,5 +52,5 @@ export class Tcc extends Model {
   advisor: User;
 
   @BelongsToMany(() => TccStudents, 'tcc_students', 'tcc_id', 'student_id')
-  tccStudents: TccStudents[];
+  students: User[];
 }

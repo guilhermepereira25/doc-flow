@@ -1,1 +1,1 @@
-export const TCC_REPOSITORY = Symbol('TccRepository');
+export const TCC_PRESENTATION_REPOSITORY = Symbol('TccPresentationRepository');

@@ -5,7 +5,6 @@ import { TccPresentation } from '../entities/tcc-presentation.entity';
 export interface TccPresentationRepository {
   create(
     createTccPresentationDto: CreateTccPresentationDto,
-    profileId: string,
   ): Promise<TccPresentation>;
   findAll(): Promise<TccPresentation[]>;
   findOne(id: string): Promise<TccPresentation>;

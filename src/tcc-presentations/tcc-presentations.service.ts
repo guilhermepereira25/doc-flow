@@ -1,26 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateTccPresentationDto } from './dto/create-tcc-presentation.dto';
 import { UpdateTccPresentationDto } from './dto/update-tcc-presentation.dto';
+import { TccPresentationRepository } from './repositories/tcc-presentation.repository.interface';
 
 @Injectable()
 export class TccPresentationsService {
-  create(createTccPresentationDto: CreateTccPresentationDto) {
-    return 'This action adds a new tccPresentation';
+  constructor(
+    @Inject('TccPresentationRepository')
+    private readonly tccRepository: TccPresentationRepository,
+  ) {}
+
+  async create(createTccPresentationDto: CreateTccPresentationDto) {
+    return await this.tccRepository.create(createTccPresentationDto);
   }
 
-  findAll() {
-    return `This action returns all tccPresentations`;
+  async findAll() {
+    return await this.tccRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tccPresentation`;
+  async findOne(id: string) {
+    return await this.tccRepository.findOne(id);
   }
 
-  update(id: number, updateTccPresentationDto: UpdateTccPresentationDto) {
-    return `This action updates a #${id} tccPresentation`;
+  async update(id: string, updateTccPresentationDto: UpdateTccPresentationDto) {
+    return await this.tccRepository.update(id, updateTccPresentationDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tccPresentation`;
+  async remove(id: string) {
+    return await this.tccRepository.remove(id);
   }
 }

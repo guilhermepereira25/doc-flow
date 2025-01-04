@@ -18,30 +18,33 @@ export class TccPresentationsController {
   ) {}
 
   @Post()
-  create(@Body() createTccPresentationDto: CreateTccPresentationDto) {
-    return this.tccPresentationsService.create(createTccPresentationDto);
+  async create(@Body() createTccPresentationDto: CreateTccPresentationDto) {
+    return await this.tccPresentationsService.create(createTccPresentationDto);
   }
 
   @Get()
-  findAll() {
-    return this.tccPresentationsService.findAll();
+  async findAll() {
+    return await this.tccPresentationsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tccPresentationsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.tccPresentationsService.findOne(id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateTccPresentationDto: UpdateTccPresentationDto,
   ) {
-    return this.tccPresentationsService.update(+id, updateTccPresentationDto);
+    return await this.tccPresentationsService.update(
+      id,
+      updateTccPresentationDto,
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tccPresentationsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.tccPresentationsService.remove(id);
   }
 }

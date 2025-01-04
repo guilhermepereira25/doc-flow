@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { EventsModule } from './events/events.module';
 import { RolesModule } from './roles/roles.module';
 import { FilesModule } from './files/files.module';
-import { CertificatesModule } from './certificates/certificates.module';
 import { PresencesModule } from './presences/presences.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
@@ -18,7 +17,6 @@ import { RolesGuard } from './roles/roles.guard';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
 import { TccModule } from './tcc/tcc.module';
-import { TccPresentationsModule } from './tcc_presentations/tcc_presentations.module';
 import { TccPresentationsModule } from './tcc-presentations/tcc-presentations.module';
 import { TccStudentsModule } from './tcc-students/tcc-students.module';
 @Module({
@@ -59,7 +57,6 @@ import { TccStudentsModule } from './tcc-students/tcc-students.module';
     EventsModule,
     RolesModule,
     FilesModule,
-    CertificatesModule,
     PresencesModule,
     AuthModule,
     TccModule,

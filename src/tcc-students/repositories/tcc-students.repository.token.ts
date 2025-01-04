@@ -1,1 +1,1 @@
-export const TCC_REPOSITORY = Symbol('TccRepository');
+export const TCC_STUDENTS_REPOSITORY = Symbol('TccStudentsRepository');

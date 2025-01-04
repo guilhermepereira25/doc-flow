@@ -3,10 +3,7 @@ import { UpdateTccStudentDto } from '../dto/update-tcc-student.dto';
 import { TccStudents } from '../entities/tcc-students.entity';
 
 export interface TccStudentsRepository {
-  create(
-    createTccStudentsDto: CreateTccStudentDto,
-    profileId: string,
-  ): Promise<TccStudents>;
+  create(createTccStudentsDto: CreateTccStudentDto): Promise<TccStudents>;
   findAll(): Promise<TccStudents[]>;
   findOne(id: string): Promise<TccStudents>;
   update(id: string, updateTccStudentDto: UpdateTccStudentDto): Promise<string>;

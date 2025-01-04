@@ -16,30 +16,41 @@ export class TccStudentsController {
   constructor(private readonly tccStudentsService: TccStudentsService) {}
 
   @Post()
-  create(@Body() createTccStudentDto: CreateTccStudentDto) {
-    return this.tccStudentsService.create(createTccStudentDto);
+  async create(@Body() createTccStudentDto: CreateTccStudentDto) {
+    try {
+      const tccStudents =
+        await this.tccStudentsService.create(createTccStudentDto);
+      return tccStudents;
+    } catch (err) {
+      if (process.env.APP_ENV == 'development') {
+        console.error(err);
+      }
+      return {
+        message: 'Internal server error',
+      };
+    }
   }
 
   @Get()
-  findAll() {
-    return this.tccStudentsService.findAll();
+  async findAll() {
+    return await this.tccStudentsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tccStudentsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.tccStudentsService.findOne(id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateTccStudentDto: UpdateTccStudentDto,
   ) {
-    return this.tccStudentsService.update(+id, updateTccStudentDto);
+    return await this.tccStudentsService.update(id, updateTccStudentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tccStudentsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.tccStudentsService.remove(id);
   }
 }

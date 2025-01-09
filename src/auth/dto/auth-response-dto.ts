@@ -1,9 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { ApiResponse as ApiResponseInstance } from '../../lib/api-response';
+import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
-export class AuthResponseDto<T> extends OmitType(ApiResponseInstance, [
-  'data',
-]) {
+export class AuthResponseDto<T> extends OmitType(ApiResponseDto, ['data']) {
   @ApiProperty({
     example: {
       accessToken: 'token',

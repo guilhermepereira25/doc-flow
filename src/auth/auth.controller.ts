@@ -7,6 +7,7 @@ import { Public } from './decorators/public-auth.decorator';
 import { ApiResponse } from '@nestjs/swagger';
 import { ApiResponse as ApiResponseInstance } from '../lib/api-response';
 import { AuthResponseDto } from './dto/auth-response-dto';
+import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,6 +17,11 @@ export class AuthController {
     status: 200,
     description: 'Sign in',
     type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid credentials',
+    type: ApiResponseDto,
   })
   @Public()
   @Post('signin')

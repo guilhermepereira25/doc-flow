@@ -66,7 +66,9 @@ export class AuthService {
       password: hashedPassword,
       profileId: signupDto.profileId,
     });
-    const accessToken = await this.generateJwtPayloadAndGetAccessToken(newUser);
+    const accessToken = await this.generateJwtPayloadAndGetAccessToken(
+      newUser.data.user,
+    );
     return {
       access_token: accessToken,
     };

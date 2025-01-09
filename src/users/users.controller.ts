@@ -16,6 +16,9 @@ import { Profiles } from 'src/profile/decorators/profile.decorator';
 import { Profile } from 'src/profile/enum/profile.enum';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { CreateUserResponseDto } from './dto/create-user-response.dto';
+import { ApiResponse as ApiResponseInstance } from 'src/lib/api-response';
+import { GetAllUsersResponseDto } from './dto/get-all-users-response.dto';
 
 @ApiBearerAuth()
 @Controller('users')
@@ -23,16 +26,26 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Create a user' })
-  @ApiResponse({ status: 201, description: 'The record created', type: User })
+  @ApiResponse({
+    status: 201,
+    description: 'The record created',
+    type: CreateUserResponseDto,
+  })
   @Profiles(Profile.Admin, Profile.Professor)
   @Post()
   async create(@Res() res: Response, @Body() createUserDto: CreateUserDto) {
     try {
-      const user = await this.usersService.create(createUserDto);
-      if (!user) {
+      const userCreateResult = await this.usersService.create(createUserDto);
+      if (!userCreateResult) {
         return res.status(409).json({ message: 'User already exists' });
       }
-      return res.status(201).json(user);
+      return res.status(201).json(
+        new ApiResponseInstance<{ user: User }>({
+          ...userCreateResult,
+          status: 201,
+          error: null,
+        }),
+      );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
@@ -48,35 +61,32 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Return all users',
-    schema: {
-      example: {
-        users: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440000',
-            username: 'john_doe',
-            profile_id: '550e8400-e29b-41d4-a716-446655440000',
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            username: 'jane_doe',
-            profile_id: '550e8400-e29b-41d4-a716-446655440001',
-          },
-        ],
-        page: 1,
-      },
-    },
+    type: GetAllUsersResponseDto,
   })
   @Get('page/:page')
   async findAll(@Res() res: Response, @Param('page') page: number) {
     try {
       page = page > 0 ? page : 1;
-      const users = await this.usersService.findAll(page);
-      return res.status(200).json({ users, page });
+      const findAllUserResult = await this.usersService.findAll(page);
+      return res.status(200).send(
+        new ApiResponseInstance<{ users: User[] }>({
+          ...findAllUserResult,
+          status: 200,
+          error: null,
+        }).toJson(),
+      );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).send(
+        new ApiResponseInstance<null>({
+          status: 500,
+          error: 'Internal server error',
+          data: null,
+          success: false,
+        }).toJson(),
+      );
     }
   }
 
@@ -87,8 +97,28 @@ export class UsersController {
     type: User,
   })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findOne(@Res() res: Response, @Param('id') id: string) {
+    try {
+      const findUserResult = await this.usersService.findOne(id);
+      const response = new ApiResponseInstance<{ user: User }>({
+        status: 200,
+        error: null,
+        ...findUserResult,
+      });
+      return res.status(200).json(response.toJson());
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res.status(500).json(
+        new ApiResponseInstance<null>({
+          status: 500,
+          error: 'Internal server error',
+          data: null,
+          success: false,
+        }).toJson(),
+      );
+    }
   }
 
   @Profiles(Profile.Admin, Profile.Professor)

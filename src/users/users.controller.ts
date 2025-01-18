@@ -19,17 +19,23 @@ import { User } from './entities/user.entity';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { ApiResponse as ApiResponseInstance } from 'src/lib/api-response';
 import { GetAllUsersResponseDto } from './dto/get-all-users-response.dto';
+import { Api500ResponseDto } from 'src/lib/dto/api-500-response.dto';
 
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @ApiOperation({ summary: 'Create a user' })
   @ApiResponse({
     status: 201,
     description: 'The record created',
     type: CreateUserResponseDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: Api500ResponseDto,
   })
   @Profiles(Profile.Admin, Profile.Professor)
   @Post()
@@ -51,9 +57,23 @@ export class UsersController {
         console.error(err);
       }
       if (err instanceof Error && err.message === 'Profile not found') {
-        return res.status(400).json({ message: 'Invalid profile' });
+        return res.status(400).json(
+          new ApiResponseInstance<null>({
+            status: 400,
+            error: 'Profile not found',
+            data: null,
+            success: false,
+          }),
+        );
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json(
+        new ApiResponseInstance<null>({
+          status: 500,
+          error: 'Internal server error',
+          data: null,
+          success: false,
+        }),
+      );
     }
   }
 
@@ -62,6 +82,11 @@ export class UsersController {
     status: 200,
     description: 'Return all users',
     type: GetAllUsersResponseDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: Api500ResponseDto,
   })
   @Get('page/:page')
   async findAll(@Res() res: Response, @Param('page') page: number) {
@@ -95,6 +120,11 @@ export class UsersController {
     status: 200,
     description: 'Return a user',
     type: User,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: Api500ResponseDto,
   })
   @Get(':id')
   async findOne(@Res() res: Response, @Param('id') id: string) {

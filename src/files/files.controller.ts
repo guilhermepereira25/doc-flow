@@ -24,7 +24,7 @@ import { UserRequest } from 'src';
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(private readonly filesService: FilesService) { }
 
   @ApiOperation({ summary: 'Create a file register in database' })
   @ApiResponse({
@@ -169,12 +169,6 @@ export class FilesController {
         ],
       },
     },
-  })
-  @ApiOperation({ summary: 'Return a File' })
-  @ApiResponse({
-    status: 200,
-    description: 'Return a file',
-    type: File,
   })
   @Get()
   async findAll(@Res() res: Response) {

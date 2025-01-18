@@ -1,15 +1,15 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
-export class AuthResponseDto extends OmitType(ApiResponseDto, [
+export class DownloadFileResponseDto extends OmitType(ApiResponseDto, [
   'data',
 ] as const) {
   @ApiProperty({
     example: {
-      accessToken: 'some-jwt-token',
+      message: 'File enqueued to be processed',
     },
   })
   data: {
-    accessToken: string;
+    message: string;
   };
 }

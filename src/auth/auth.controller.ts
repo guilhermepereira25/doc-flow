@@ -29,7 +29,14 @@ export class AuthController {
     try {
       const accessToken = await this.authService.signIn(signinDto);
       if (!accessToken) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json(
+          new ApiResponseInstance({
+            status: 401,
+            success: false,
+            data: null,
+            error: 'Invalid credentials',
+          }),
+        );
       }
       return res.status(200).json(
         new ApiResponseInstance({
@@ -67,7 +74,14 @@ export class AuthController {
     try {
       const accessToken = await this.authService.signUp(signupDto);
       if (!accessToken) {
-        return res.status(400).json({ message: 'User already exists' });
+        return res.status(400).json(
+          new ApiResponseInstance({
+            status: 400,
+            success: false,
+            data: null,
+            error: 'User already exists',
+          }),
+        );
       }
       return res.status(201).json(
         new ApiResponseInstance({

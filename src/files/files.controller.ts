@@ -16,7 +16,12 @@ import { FilesService } from './files.service';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { File } from './entities/file.entity';
 import { CreateFileDto } from './dto/create-file.dto';
 import { memoryStorage } from 'multer';
@@ -26,7 +31,8 @@ import { GetFileStatusResponseDto } from './dto/get-file-status-response.dto';
 import { GetAllFilesResponseDto } from './dto/get-all-files-response.dto';
 import { GetFileResponseDto } from './dto/get-file-response.dto';
 import { DownloadFileResponseDto } from './dto/download-file-response.dto';
-import { ApiResponse as ApiResponseInstance } from '../lib/api-response';
+import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
+import { UploadFileDto } from './dto/upload-file.dto';
 
 @Controller('files')
 export class FilesController {
@@ -47,42 +53,35 @@ export class FilesController {
     try {
       const userId: string = req.user?.sub;
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res
+          .status(401)
+          .json(new ApiResponseDto<null>(401, false, null, 'Unauthorized'));
       }
       const file: File = await this.filesService.create(fileCreateDto, userId);
-      return res.status(201).json(
-        new ApiResponseInstance({
-          status: 201,
-          success: true,
-          data: {
-            file,
-            message: 'File created successfully, you are able to upload it now',
-          },
-          error: null,
-        }),
-      );
+      return res
+        .status(201)
+        .json(
+          new ApiResponseDto<{ file: File }>(
+            201,
+            true,
+            { file },
+            'File created successfully, you are able to upload it now',
+          ),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
       if (err instanceof ConflictException) {
-        return res.status(409).json(
-          new ApiResponseInstance({
-            status: 409,
-            success: false,
-            data: null,
-            error: err.message,
-          }),
-        );
+        return res
+          .status(409)
+          .json(new ApiResponseDto<null>(409, false, null, err.message));
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -97,46 +96,40 @@ export class FilesController {
     try {
       const file = await this.filesService.findOne(id);
       if (!file) {
-        return res.status(404).json(
-          new ApiResponseInstance({
-            status: 404,
-            success: false,
-            data: null,
-            error: 'File not found',
-          }),
-        );
+        return res
+          .status(404)
+          .json(new ApiResponseDto<null>(404, false, null, 'File not found'));
       }
-      return res.status(200).json(
-        new ApiResponseInstance({
-          status: 200,
-          success: true,
-          data: {
-            file: {
-              id: file.id,
-              status: file.status,
-            },
-          },
-          error: null,
-        }),
-      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ file: { id: string; status: string } }>(
+            200,
+            true,
+            { file: { id: file.id, status: file.status } },
+            null,
+          ),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
   @Post('upload/:id')
   @ApiOperation({
     summary: 'Queue file to save on disk',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'File to upload',
+    type: UploadFileDto,
   })
   @ApiResponse({
     status: 202,
@@ -162,58 +155,40 @@ export class FilesController {
   ) {
     try {
       if (!file) {
-        return res.status(400).json(
-          new ApiResponseInstance({
-            status: 400,
-            success: false,
-            data: null,
-            error: 'File not found',
-          }),
-        );
+        return res
+          .status(400)
+          .json(new ApiResponseDto<null>(400, false, null, 'File not found'));
       }
       if (!isNaN(Number(id)) || id.length !== 36) {
-        return res.status(400).json(
-          new ApiResponseInstance({
-            status: 400,
-            success: false,
-            data: null,
-            error: 'Invalid id',
-          }),
-        );
+        return res
+          .status(400)
+          .json(new ApiResponseDto<null>(400, false, null, 'Invalid id'));
       }
       await this.filesService.upload(file, id);
-      return res.status(202).json(
-        new ApiResponseInstance({
-          status: 202,
-          success: true,
-          data: {
-            message: 'File enqueued to be processed',
-          },
-          error: null,
-        }),
-      );
+      return res
+        .status(202)
+        .json(
+          new ApiResponseDto<null>(
+            202,
+            true,
+            null,
+            'File enqueued to be processed',
+          ),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
       if (err instanceof ConflictException) {
-        return res.status(409).json(
-          new ApiResponseInstance({
-            status: 409,
-            success: false,
-            data: null,
-            error: err.message,
-          }),
-        );
+        return res
+          .status(409)
+          .json(new ApiResponseDto<null>(409, false, null, err.message));
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -228,35 +203,24 @@ export class FilesController {
     try {
       const files = await this.filesService.findAll();
       if (!files) {
-        return res.status(404).json(
-          new ApiResponseInstance({
-            status: 404,
-            success: false,
-            data: null,
-            error: 'Files not found',
-          }),
-        );
+        return res
+          .status(404)
+          .json(new ApiResponseDto<null>(404, false, null, 'Files not found'));
       }
-      return res.status(200).json(
-        new ApiResponseInstance({
-          status: 200,
-          success: true,
-          data: { files },
-          error: null,
-        }),
-      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ files: File[] }>(200, true, { files }, null),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -270,35 +234,22 @@ export class FilesController {
     try {
       const file = await this.filesService.findOne(id);
       if (!file) {
-        return res.status(404).json(
-          new ApiResponseInstance({
-            status: 404,
-            success: false,
-            data: null,
-            error: 'file not found',
-          }),
-        );
+        return res
+          .status(404)
+          .json(new ApiResponseDto<null>(404, false, null, 'file not found'));
       }
-      return res.status(200).json(
-        new ApiResponseInstance({
-          status: 200,
-          success: true,
-          data: file,
-          error: null,
-        }),
-      );
+      return res
+        .status(200)
+        .json(new ApiResponseDto<File>(200, true, file, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -317,28 +268,27 @@ export class FilesController {
           if (process.env.APP_ENV === 'development') {
             console.error(err);
           }
-          res.status(500).json(
-            new ApiResponseInstance({
-              status: 500,
-              success: false,
-              data: null,
-              error: 'Internal server error',
-            }),
-          );
+          res
+            .status(500)
+            .json(
+              new ApiResponseDto<null>(
+                500,
+                false,
+                null,
+                'Internal server error',
+              ),
+            );
         }
       });
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -351,28 +301,25 @@ export class FilesController {
   async remove(@Res() res: Response, @Param('id') id: string) {
     try {
       await this.filesService.remove(id);
-      return res.status(200).json(
-        new ApiResponseInstance({
-          status: 200,
-          success: true,
-          data: {
-            message: 'File deleted successfully',
-          },
-          error: null,
-        }),
-      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<null>(
+            200,
+            true,
+            null,
+            'File deleted successfully',
+          ),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 }

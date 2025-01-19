@@ -8,6 +8,7 @@ import {
   Delete,
   Res,
   Req,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { TccService } from './tcc.service';
 import { CreateTccDto } from './dto/create-tcc.dto';
@@ -17,6 +18,9 @@ import { Profiles } from 'src/profile/decorators/profile.decorator';
 import { Profile } from 'src/profile/enum/profile.enum';
 import { UserRequest } from 'src';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { GetAllTccResponseDto } from './dto/get-all-tcc-response.dto';
+import { Tcc } from './entities/tcc.entity';
+import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
 @Controller('tcc')
 export class TccController {
@@ -38,30 +42,45 @@ export class TccController {
     try {
       createTccDto.advisorId = req.user?.sub;
       const newTcc = await this.tccService.create(createTccDto);
-
-      return res.status(201).json(newTcc);
+      return res
+        .status(201)
+        .json(
+          new ApiResponseDto<{ tcc: Tcc }>(201, true, { tcc: newTcc }, null),
+        );
     } catch (err) {
-      if (process.env.APP_ENV == 'development') {
+      if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      res.status(500).json({
-        message: 'Internal server error',
-      });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
+  @ApiOperation({ summary: 'Return all TCCs' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all TCCs',
+    type: GetAllTccResponseDto,
+  })
   @Get()
   async findAll(@Res() res: Response) {
     try {
       const tccData = await this.tccService.findAll();
-      return res.status(200).json(tccData);
+      const response = new ApiResponseDto<{ tccs: Tcc[] }>(
+        200,
+        true,
+        { tccs: tccData },
+        null,
+      );
+      return res.status(200).json(response);
     } catch (err) {
       if (process.env.APP_ENV == 'development') {
         console.error(err);
       }
-      res.status(500).json({
-        message: 'Internal server error',
-      });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -69,14 +88,21 @@ export class TccController {
   async findOne(@Res() res: Response, @Param('id') id: string) {
     try {
       const tcc = await this.tccService.findOne(id);
-      return res.status(200).json(tcc);
+      if (!tcc) {
+        return res
+          .status(404)
+          .json(new ApiResponseDto<null>(404, false, null, 'TCC not found'));
+      }
+      return res
+        .status(200)
+        .json(new ApiResponseDto<{ tcc: Tcc }>(200, true, { tcc }, null));
     } catch (err) {
-      if (process.env.APP_ENV == 'development') {
+      if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      res.status(500).json({
-        message: 'Internal server error',
-      });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -89,14 +115,28 @@ export class TccController {
   ) {
     try {
       const updatedTcc = await this.tccService.update(id, updateTccDto);
-      return res.status(200).json(updatedTcc);
+      if (!updatedTcc) {
+        return res
+          .status(404)
+          .json(new ApiResponseDto<null>(404, false, null, 'TCC not found'));
+      }
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ tcc: Tcc }>(
+            200,
+            true,
+            { tcc: updatedTcc },
+            null,
+          ),
+        );
     } catch (err) {
-      if (process.env.APP_ENV == 'development') {
+      if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      res.status(500).json({
-        message: 'Internal server error',
-      });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -105,14 +145,18 @@ export class TccController {
   async remove(@Res() res: Response, @Param('id') id: string) {
     try {
       await this.tccService.remove(id);
-      return res.status(204).send();
+      return res
+        .status(200)
+        .json(new ApiResponseDto<object>(200, true, {}, null));
     } catch (err) {
-      if (process.env.APP_ENV == 'development') {
+      if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      res.status(500).json({
-        message: 'Internal server error',
-      });
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 }

@@ -34,11 +34,11 @@ export class ProfileService {
     return profile;
   }
 
-  async update(id: number, updateProfileDto: UpdateProfileDto) {
+  async update(id: string, updateProfileDto: UpdateProfileDto) {
     return `This action updates a #${id} profile`;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return `This action removes a #${id} profile`;
   }
 

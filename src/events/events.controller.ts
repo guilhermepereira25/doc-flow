@@ -135,14 +135,7 @@ export class EventsController {
       await this.eventsService.remove(id);
       return res
         .status(200)
-        .json(
-          new ApiResponseDto<null>(
-            200,
-            true,
-            null,
-            'Event deleted successfully',
-          ),
-        );
+        .json(new ApiResponseDto<null>(200, true, null, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
@@ -167,7 +160,7 @@ export class EventsController {
       await this.eventsService.endEvent(id);
       return res
         .status(200)
-        .json(new ApiResponseDto<null>(200, true, null, 'Event ended'));
+        .json(new ApiResponseDto<object>(200, true, {}, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);

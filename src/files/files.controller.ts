@@ -168,11 +168,11 @@ export class FilesController {
       return res
         .status(202)
         .json(
-          new ApiResponseDto<null>(
+          new ApiResponseDto<string>(
             202,
             true,
-            null,
             'File enqueued to be processed',
+            null,
           ),
         );
     } catch (err) {

@@ -38,10 +38,10 @@ export class UserRepositoryImpl implements UserRepository {
     return newUser;
   }
 
-  async findAll(page: number): Promise<User[]> {
+  async findAll(limit: number, offset: number): Promise<User[]> {
     return this.userModel.scope('excludePassword').findAll({
-      limit: 10,
-      offset: (page - 1) * 10,
+      limit: limit,
+      offset: offset,
     });
   }
 
@@ -53,9 +53,16 @@ export class UserRepositoryImpl implements UserRepository {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<string> {
-    // Implement update logic here
-    return `This action updates a #${id} user`;
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<[number, User[]]> {
+    return await this.userModel.update(updateUserDto, {
+      where: {
+        id,
+      },
+      returning: true,
+    });
   }
 
   async remove(id: string): Promise<number> {

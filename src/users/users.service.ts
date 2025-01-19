@@ -36,10 +36,13 @@ export class UsersService {
     return new ServiceLayerDto<{ user: User }>({ user }, true);
   }
 
-  async findAll(page: number): Promise<ServiceLayerDto<{ users: User[] }>> {
-    const users = await this.userRepository.findAll(page);
-    return new ServiceLayerDto<{ users: User[]; page: number }>(
-      { users, page },
+  async findAll(
+    limit: number,
+    offset: number,
+  ): Promise<ServiceLayerDto<{ users: User[] }>> {
+    const users = await this.userRepository.findAll(limit, offset);
+    return new ServiceLayerDto<{ users: User[] }>(
+      { users },
       users.length > 0 ? true : false,
     );
   }
@@ -49,8 +52,12 @@ export class UsersService {
     return new ServiceLayerDto<{ user: User }>({ user }, user ? true : false);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userRepository.update(id, updateUserDto);
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const [number, user] = await this.userRepository.update(id, updateUserDto);
+    if (number === 0) {
+      throw new Error('User not found');
+    }
+    return user[0];
   }
 
   async remove(id: string) {

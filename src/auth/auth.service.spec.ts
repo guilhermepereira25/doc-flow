@@ -6,6 +6,7 @@ import { SignInAuthDto } from './dto/signin-auth.dto';
 import { SignUpAuthDto } from './dto/singup-auth.dto';
 import { User } from 'src/users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { ServiceLayerDto } from 'src/lib/dto/service-layer.dto';
 
 jest.mock('bcrypt');
 
@@ -96,7 +97,9 @@ describe('AuthService', () => {
 
       jest.spyOn(usersService, 'findByUsername').mockResolvedValue(null);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-      jest.spyOn(usersService, 'create').mockResolvedValue(userData);
+      jest
+        .spyOn(usersService, 'create')
+        .mockResolvedValue(new ServiceLayerDto({ user: userData }, true));
 
       const result = await service.signUp(signUpDto);
       expect(result).toEqual({ access_token: 'token' });

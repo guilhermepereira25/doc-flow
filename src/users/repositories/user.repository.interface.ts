@@ -4,9 +4,9 @@ import { User } from '../entities/user.entity';
 
 export interface UserRepository {
   create(createUserDto: CreateUserDto, profileId: string): Promise<User>;
-  findAll(page: number): Promise<User[]>;
+  findAll(limit: number, offset: number): Promise<User[]>;
   findOne(id: string): Promise<User>;
-  update(id: string, updateUserDto: UpdateUserDto): Promise<string>;
+  update(id: string, updateUserDto: UpdateUserDto): Promise<[number, User[]]>;
   remove(id: string): Promise<number>;
   findByUsername(username: string): Promise<User>;
   findByPk(id: string): Promise<User>;

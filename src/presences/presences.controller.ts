@@ -8,6 +8,7 @@ import {
   Delete,
   Res,
   Req,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { PresencesService } from './presences.service';
 import { CreatePresenceDto } from './dto/create-presence.dto';
@@ -22,6 +23,11 @@ import {
 } from '@nestjs/swagger';
 import { Presence } from './entities/presence.entity';
 import { UserRequest } from 'src';
+import { GetAllPresencesResponseDto } from './dto/get-all-presences-response.dto';
+import { GetPresenceResponseDto } from './dto/get-presence-response.dto';
+import { GetAllPresencesByEventResponseDto } from './dto/get-all-presences-by-event-response.dto';
+import { GetAllPresencesByUserResponseDto } from './dto/get-all-presences-by-user-response.dto';
+import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
 @Controller('presences')
 export class PresencesController {
@@ -50,21 +56,43 @@ export class PresencesController {
     try {
       const userId: string = req.user?.sub;
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res
+          .status(401)
+          .json(new ApiResponseDto<null>(401, false, null, 'Unauthorized'));
       }
       const presence = await this.presencesService.create(
         userId,
         createPresenceDto,
       );
       if (!presence) {
-        return res.status(409).json({ message: 'Presence already exists' });
+        return res
+          .status(409)
+          .json(
+            new ApiResponseDto<null>(
+              409,
+              false,
+              null,
+              'Presence already exists',
+            ),
+          );
       }
-      return res.status(201).json(presence);
+      return res
+        .status(201)
+        .json(
+          new ApiResponseDto<{ presence: Presence }>(
+            201,
+            true,
+            { presence },
+            null,
+          ),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -73,33 +101,29 @@ export class PresencesController {
   @ApiResponse({
     status: 200,
     description: 'Return all presences',
-    schema: {
-      example: {
-        presences: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440000',
-            event_id: '550e8400-e29b-41d4-a716-446655440000',
-            user_id: '550e8400-e29b-41d4-a716-446655440000',
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            event_id: '550e8400-e29b-41d4-a716-446655440000',
-            user_id: '550e8400-e29b-41d4-a716-446655440000',
-          },
-        ],
-      },
-    },
+    type: GetAllPresencesResponseDto,
   })
   @Get()
   async findAll(@Res() res: Response) {
     try {
       const presences = await this.presencesService.findAll();
-      return res.status(200).json(presences);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ presences: Presence[] }>(
+            200,
+            true,
+            { presences },
+            null,
+          ),
+        );
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -107,27 +131,36 @@ export class PresencesController {
   @ApiResponse({
     status: 200,
     description: 'Return a presence',
-    schema: {
-      example: {
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        event_id: '550e8400-e29b-41d4-a716-446655440000',
-        user_id: '550e8400-e29b-41d4-a716-446655440000',
-      },
-    },
+    type: GetPresenceResponseDto,
   })
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
       const presence = await this.presencesService.findOne(id);
       if (!presence) {
-        return res.status(404).json({ message: 'Presence not found' });
+        return res
+          .status(404)
+          .json(
+            new ApiResponseDto<null>(404, false, null, 'Presence not found'),
+          );
       }
-      return res.status(200).json(presence);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ presence: Presence }>(
+            200,
+            true,
+            { presence },
+            null,
+          ),
+        );
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -144,14 +177,29 @@ export class PresencesController {
         updatePresenceDto,
       );
       if (!updatedPresence) {
-        return res.status(404).json({ message: 'Presence not found' });
+        return res
+          .status(404)
+          .json(
+            new ApiResponseDto<null>(404, false, null, 'Presence not found'),
+          );
       }
-      return res.status(200).json(updatedPresence);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ presence: Presence }>(
+            200,
+            true,
+            { presence: updatedPresence },
+            null,
+          ),
+        );
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -160,12 +208,16 @@ export class PresencesController {
   async remove(@Param('id') id: string, @Res() res: Response) {
     try {
       await this.presencesService.remove(id);
-      return res.status(200).json({ message: 'Presence removed successfully' });
+      return res
+        .status(200)
+        .json(new ApiResponseDto<object>(200, true, {}, null));
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -173,33 +225,29 @@ export class PresencesController {
   @ApiResponse({
     status: 200,
     description: 'Get all presences for event',
-    schema: {
-      example: {
-        presences: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440000',
-            event_id: '550e8400-e29b-41d4-a716-446655440000',
-            user_id: '550e8400-e29b-41d4-a716-446655440000',
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            event_id: '550e8400-e29b-41d4-a716-446655440000',
-            user_id: '550e8400-e29b-41d4-a716-446655440000',
-          },
-        ],
-      },
-    },
+    type: GetAllPresencesByEventResponseDto,
   })
   @Get('event/:id')
   async findAllByEvent(@Param('id') id: string, @Res() res: Response) {
     try {
       const presences = await this.presencesService.findAllByEvent(id);
-      return res.status(200).json(presences);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ presences: Presence[] }>(
+            200,
+            true,
+            { presences },
+            null,
+          ),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 
@@ -207,33 +255,29 @@ export class PresencesController {
   @ApiResponse({
     status: 200,
     description: 'Get all presences for user',
-    schema: {
-      example: {
-        presences: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440000',
-            event_id: '550e8400-e29b-41d4-a716-446655440000',
-            user_id: '550e8400-e29b-41d4-a716-446655440000',
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            event_id: '550e8400-e29b-41d4-a716-446655440000',
-            user_id: '550e8400-e29b-41d4-a716-446655440000',
-          },
-        ],
-      },
-    },
+    type: GetAllPresencesByUserResponseDto,
   })
   @Get('user/:id')
   async findAllByUser(@Param('id') id: string, @Res() res: Response) {
     try {
       const presences = await this.presencesService.findAllByUser(id);
-      return res.status(200).json(presences);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ presences: Presence[] }>(
+            200,
+            true,
+            { presences },
+            null,
+          ),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      throw new InternalServerErrorException(
+        new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+      );
     }
   }
 }

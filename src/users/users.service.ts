@@ -6,6 +6,8 @@ import { USER_REPOSITORY } from './repositories/user-repository.token';
 import { ProfileService } from '../profile/profile.service';
 import { Profile as ProfileEnum } from 'src/profile/enum/profile.enum';
 import { Profile as ProfileModel } from 'src/profile/entities/profile.entity';
+import { ServiceLayerDto } from 'src/lib/dto/service-layer.dto';
+import { User } from './entities/user.entity';
 @Injectable()
 export class UsersService {
   constructor(
@@ -14,7 +16,9 @@ export class UsersService {
     private readonly profileService: ProfileService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<ServiceLayerDto<{ user: User }>> {
     let profile: ProfileModel | null;
     if (!createUserDto.profileId) {
       profile = await this.profileService.findByProfileName(ProfileEnum.User);
@@ -28,23 +32,36 @@ export class UsersService {
         throw new Error('Profile not found');
       }
     }
-    return await this.userRepository.create(createUserDto, profile.id);
+    const user = await this.userRepository.create(createUserDto, profile.id);
+    return new ServiceLayerDto<{ user: User }>({ user }, true);
   }
 
-  async findAll(page: number) {
-    return await this.userRepository.findAll(page);
+  async findAll(
+    limit: number,
+    offset: number,
+  ): Promise<ServiceLayerDto<{ users: User[] }>> {
+    const users = await this.userRepository.findAll(limit, offset);
+    return new ServiceLayerDto<{ users: User[] }>(
+      { users },
+      users.length > 0 ? true : false,
+    );
   }
 
-  async findOne(id: string) {
-    return this.userRepository.findByPk(id);
+  async findOne(id: string): Promise<ServiceLayerDto<{ user: User }>> {
+    const user = await this.userRepository.findByPk(id);
+    return new ServiceLayerDto<{ user: User }>({ user }, user ? true : false);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userRepository.update(id, updateUserDto);
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const [number, user] = await this.userRepository.update(id, updateUserDto);
+    if (number === 0) {
+      throw new Error('User not found');
+    }
+    return user[0];
   }
 
-  remove(id: string) {
-    return this.userRepository.remove(id);
+  async remove(id: string) {
+    return await this.userRepository.remove(id);
   }
 
   async findByUsername(username: string) {

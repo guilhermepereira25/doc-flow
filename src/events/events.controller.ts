@@ -18,6 +18,10 @@ import { Profile } from 'src/profile/enum/profile.enum';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Event } from './entities/event.entity';
+import { GetAllEventsResponseDto } from './dto/get-all-events-response.dto';
+import { GetEventResponseDto } from './dto/get-event-response.dto';
+import { EndEventResponseDto } from './dto/end-event-response.dto';
+import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
 @Controller('events')
 export class EventsController {
@@ -34,18 +38,28 @@ export class EventsController {
   async create(@Res() res: Response, @Body() createEventDto: CreateEventDto) {
     try {
       const event = await this.eventsService.create(createEventDto);
-      return res.status(201).json(event);
+      return res
+        .status(201)
+        .json(new ApiResponseDto<Event>(201, true, event, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
       if (err instanceof ConflictException) {
-        return res.status(409).json({ message: err.message });
+        return res
+          .status(409)
+          .json(new ApiResponseDto<null>(409, false, null, err.message));
       }
       if (err instanceof BadRequestException) {
-        return res.status(400).json(err.getResponse());
+        return res
+          .status(400)
+          .json(new ApiResponseDto<null>(400, false, null, 'Invalid data'));
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -53,31 +67,24 @@ export class EventsController {
   @ApiResponse({
     status: 200,
     description: 'Return all events',
-    schema: {
-      example: {
-        users: [
-          {
-            id: '550e8400-e29b-41d4-a716-446655440000',
-            name: 'EVENT 1',
-          },
-          {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            name: 'EVENT 2',
-          },
-        ],
-      },
-    },
+    type: GetAllEventsResponseDto,
   })
   @Get()
   async findAll(@Res() res: Response) {
     try {
       const events = await this.eventsService.findAll();
-      return res.status(200).json(events);
+      return res
+        .status(200)
+        .json(new ApiResponseDto<Event[]>(200, true, events, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -85,21 +92,33 @@ export class EventsController {
   @ApiResponse({
     status: 200,
     description: 'Return an event',
-    type: Event,
+    type: GetEventResponseDto,
   })
   @Get(':id')
   async findOne(@Res() res: Response, @Param('id') id: string) {
     try {
       const [event, isStarted, isEnded] = await this.eventsService.findOne(id);
       if (!event) {
-        return res.status(404).json({ message: 'Event not found' });
+        return res
+          .status(404)
+          .json(new ApiResponseDto<null>(404, false, null, 'Event not found'));
       }
-      return res.status(200).json({ event, isStarted, isEnded });
+      return res.status(200).json(
+        new ApiResponseDto<{
+          event: Event;
+          isStarted: boolean;
+          isEnded: boolean;
+        }>(200, true, { event, isStarted, isEnded }, null),
+      );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -111,25 +130,46 @@ export class EventsController {
 
   @Profiles(Profile.Admin, Profile.Professor)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(id);
+  async remove(@Res() res: Response, @Param('id') id: string) {
+    try {
+      await this.eventsService.remove(id);
+      return res
+        .status(200)
+        .json(new ApiResponseDto<null>(200, true, null, null));
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
+    }
   }
 
   @ApiOperation({ summary: 'End an event' })
   @ApiResponse({
     status: 200,
     description: 'End an event',
+    type: EndEventResponseDto,
   })
   @Post('end/:id')
   async endEvent(@Res() res: Response, @Param('id') id: string) {
     try {
       await this.eventsService.endEvent(id);
-      return res.status(200).json({ message: 'Event ended' });
+      return res
+        .status(200)
+        .json(new ApiResponseDto<object>(200, true, {}, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json({ message: 'Internal server error' });
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 }

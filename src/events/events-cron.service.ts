@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { EventsService } from './events.service';
-import { CronService } from 'src/common/cron-service';
+import { CronService } from 'src/lib/cron-service';
 import * as path from 'path';
 import { unlink, readdir } from 'fs/promises';
 

@@ -21,7 +21,7 @@ import { Event } from './entities/event.entity';
 import { GetAllEventsResponseDto } from './dto/get-all-events-response.dto';
 import { GetEventResponseDto } from './dto/get-event-response.dto';
 import { EndEventResponseDto } from './dto/end-event-response.dto';
-import { ApiResponse as ApiResponseInstance } from '../lib/api-response';
+import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
 @Controller('events')
 export class EventsController {
@@ -38,46 +38,28 @@ export class EventsController {
   async create(@Res() res: Response, @Body() createEventDto: CreateEventDto) {
     try {
       const event = await this.eventsService.create(createEventDto);
-      return res.status(201).json(
-        new ApiResponseInstance({
-          status: 201,
-          success: true,
-          data: event,
-          error: null,
-        }),
-      );
+      return res
+        .status(201)
+        .json(new ApiResponseDto<Event>(201, true, event, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
       if (err instanceof ConflictException) {
-        return res.status(409).json(
-          new ApiResponseInstance({
-            status: 409,
-            success: false,
-            data: null,
-            error: err.message,
-          }),
-        );
+        return res
+          .status(409)
+          .json(new ApiResponseDto<null>(409, false, null, err.message));
       }
       if (err instanceof BadRequestException) {
-        return res.status(400).json(
-          new ApiResponseInstance({
-            status: 400,
-            success: false,
-            data: null,
-            error: 'Invalid data',
-          }),
-        );
+        return res
+          .status(400)
+          .json(new ApiResponseDto<null>(400, false, null, 'Invalid data'));
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -91,26 +73,18 @@ export class EventsController {
   async findAll(@Res() res: Response) {
     try {
       const events = await this.eventsService.findAll();
-      return res.status(200).json(
-        new ApiResponseInstance({
-          status: 200,
-          success: true,
-          data: events,
-          error: null,
-        }),
-      );
+      return res
+        .status(200)
+        .json(new ApiResponseDto<Event[]>(200, true, events, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -125,35 +99,26 @@ export class EventsController {
     try {
       const [event, isStarted, isEnded] = await this.eventsService.findOne(id);
       if (!event) {
-        return res.status(404).json(
-          new ApiResponseInstance({
-            status: 404,
-            success: false,
-            data: null,
-            error: 'Event not found',
-          }),
-        );
+        return res
+          .status(404)
+          .json(new ApiResponseDto<null>(404, false, null, 'Event not found'));
       }
       return res.status(200).json(
-        new ApiResponseInstance({
-          status: 200,
-          success: true,
-          data: { event, isStarted, isEnded },
-          error: null,
-        }),
+        new ApiResponseDto<{
+          event: Event;
+          isStarted: boolean;
+          isEnded: boolean;
+        }>(200, true, { event, isStarted, isEnded }, null),
       );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -165,8 +130,29 @@ export class EventsController {
 
   @Profiles(Profile.Admin, Profile.Professor)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(id);
+  async remove(@Res() res: Response, @Param('id') id: string) {
+    try {
+      await this.eventsService.remove(id);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<null>(
+            200,
+            true,
+            null,
+            'Event deleted successfully',
+          ),
+        );
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
+    }
   }
 
   @ApiOperation({ summary: 'End an event' })
@@ -179,28 +165,18 @@ export class EventsController {
   async endEvent(@Res() res: Response, @Param('id') id: string) {
     try {
       await this.eventsService.endEvent(id);
-      return res.status(200).json(
-        new ApiResponseInstance({
-          status: 200,
-          success: true,
-          data: {
-            message: 'Event ended',
-          },
-          error: null,
-        }),
-      );
+      return res
+        .status(200)
+        .json(new ApiResponseDto<null>(200, true, null, 'Event ended'));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 }

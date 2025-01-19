@@ -5,7 +5,6 @@ import { Response } from 'express';
 import { SignUpAuthDto } from './dto/singup-auth.dto';
 import { Public } from './decorators/public-auth.decorator';
 import { ApiResponse } from '@nestjs/swagger';
-import { ApiResponse as ApiResponseInstance } from '../lib/api-response';
 import { AuthResponseDto } from './dto/auth-response-dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 
@@ -38,14 +37,11 @@ export class AuthController {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance<null>({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 
@@ -60,37 +56,29 @@ export class AuthController {
     try {
       const accessToken = await this.authService.signUp(signupDto);
       if (!accessToken) {
-        return res.status(400).json(
-          new ApiResponseInstance({
-            status: 400,
-            success: false,
-            data: null,
-            error: 'User already exists',
-          }),
-        );
+        return res
+          .status(400)
+          .json(new ApiResponseDto(400, false, null, 'User already exists'));
       }
       return res.status(201).json(
-        new ApiResponseInstance({
-          status: 201,
-          success: true,
-          data: {
+        new ApiResponseDto(
+          201,
+          true,
+          {
             accessToken,
           },
-          error: null,
-        }),
+          null,
+        ),
       );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
       }
-      return res.status(500).json(
-        new ApiResponseInstance<null>({
-          status: 500,
-          success: false,
-          data: null,
-          error: 'Internal server error',
-        }),
-      );
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
     }
   }
 }

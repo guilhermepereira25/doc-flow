@@ -1,6 +1,8 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateTccStudentDto {
+  @ApiProperty()
   @IsNotEmpty({
     message: 'students is required',
   })
@@ -9,6 +11,7 @@ export class CreateTccStudentDto {
   })
   students: string[];
 
+  @ApiProperty()
   @IsNotEmpty({
     message: 'tccId is required',
   })

@@ -12,11 +12,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  private async authenticate(
-    username: string,
-    password: string,
-  ): Promise<User> {
-    const user = await this.usersService.findByUsername(username);
+  private async authenticate(email: string, password: string): Promise<User> {
+    const user = await this.usersService.findByEmail(email);
     if (!user) {
       return null;
     }
@@ -30,7 +27,7 @@ export class AuthService {
   private async generateJwtPayloadAndGetAccessToken(user: User) {
     const payload = {
       sub: user.id,
-      username: user.username,
+      email: user.email,
       profile: user.profile,
     };
     return await this.jwtService.signAsync(payload);
@@ -42,7 +39,7 @@ export class AuthService {
 
   async signIn(signInDto: SignInAuthDto): Promise<{ access_token: string }> {
     const authenticateUser = await this.authenticate(
-      signInDto.username,
+      signInDto.email,
       signInDto.password,
     );
     if (!authenticateUser) {
@@ -56,13 +53,13 @@ export class AuthService {
   }
 
   async signUp(signupDto: SignUpAuthDto): Promise<{ access_token: string }> {
-    const user = await this.usersService.findByUsername(signupDto.username);
+    const user = await this.usersService.findByEmail(signupDto.email);
     if (user) {
       throw new Error('User already exists');
     }
     const hashedPassword = await this.hashPassword(signupDto.password);
     const newUser = await this.usersService.create({
-      username: signupDto.username,
+      email: signupDto.email,
       password: hashedPassword,
       profileId: signupDto.profileId,
     });

@@ -1,14 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsStrongPassword } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+  Matches,
+} from 'class-validator';
 
 export class SignUpAuthDto {
-  @IsString()
   @ApiProperty()
-  username: string;
+  @IsEmail()
+  @Matches(/@cefet-rj\.br$/, {
+    message: 'Only email from cefet-rj.br domain are allowed',
+  })
+  @IsNotEmpty()
+  email: string;
 
   @ApiProperty()
+  @IsString()
   @IsStrongPassword()
+  @IsNotEmpty()
   password: string;
+
+  @ApiProperty()
+  @Matches(/\d{4}\d{3}[A-Z]{4}$/, {
+    message: 'Enrollment must be in the format 99992020SINF',
+  })
+  @IsString()
+  enrollment?: string;
 
   @ApiProperty({
     required: false,

@@ -15,7 +15,7 @@ describe('AuthService', () => {
   let usersService: UsersService;
   const userData: User = {
     id: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
-    username: 'test',
+    email: 'email@cefet-rj.br',
     password: 'hashedPassword',
     profile: {
       id: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
@@ -30,7 +30,7 @@ describe('AuthService', () => {
         {
           provide: UsersService,
           useValue: {
-            findByUsername: jest.fn(() => Promise.resolve(userData)),
+            findByEmail: jest.fn(() => Promise.resolve(userData)),
             create: jest.fn(() => Promise.resolve(userData)),
           },
         },
@@ -53,19 +53,19 @@ describe('AuthService', () => {
 
   describe('signIn', () => {
     it('should return access token if credentials are valid', async () => {
-      const signInDto: SignInAuthDto = { username: 'test', password: 'test' };
+      const signInDto: SignInAuthDto = { email: 'test', password: 'test' };
 
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(userData);
+      jest.spyOn(usersService, 'findByEmail').mockResolvedValue(userData);
 
       const result = await service.signIn(signInDto);
       expect(result).toEqual({ access_token: 'token' });
     });
 
     it('should return null if credentials are invalid', async () => {
-      const signInDto: SignInAuthDto = { username: 'test', password: 'test' };
+      const signInDto: SignInAuthDto = { email: 'test', password: 'test' };
 
-      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(userData);
+      jest.spyOn(usersService, 'findByEmail').mockResolvedValue(userData);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       const result = await service.signIn(signInDto);
@@ -76,12 +76,12 @@ describe('AuthService', () => {
   describe('signUp', () => {
     it('should throw an error if user already exists', async () => {
       const signUpDto: SignUpAuthDto = {
-        username: 'test',
+        email: 'test',
         password: 'test',
         profileId: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
       };
 
-      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(userData);
+      jest.spyOn(usersService, 'findByEmail').mockResolvedValue(userData);
 
       await expect(service.signUp(signUpDto)).rejects.toThrow(
         'User already exists',
@@ -90,12 +90,12 @@ describe('AuthService', () => {
 
     it('should return access token if user is created successfully', async () => {
       const signUpDto: SignUpAuthDto = {
-        username: 'test',
+        email: 'test',
         password: 'test',
         profileId: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
       };
 
-      jest.spyOn(usersService, 'findByUsername').mockResolvedValue(null);
+      jest.spyOn(usersService, 'findByEmail').mockResolvedValue(null);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       jest
         .spyOn(usersService, 'create')

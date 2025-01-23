@@ -73,10 +73,10 @@ export class UserRepositoryImpl implements UserRepository {
     });
   }
 
-  async findByUsername(username: string): Promise<User> {
+  async findByEmail(email: string): Promise<User> {
     const user = await this.userModel.findOne({
       where: {
-        username,
+        email,
       },
       include: [
         {

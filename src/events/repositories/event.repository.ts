@@ -18,6 +18,7 @@ export class EventRepositoryImpl implements EventRepository {
       start_at: createEventDto.eventStartDate,
       end_at: createEventDto.eventEndDate,
       status: createEventDto.status,
+      created_by_user_id: createEventDto.created_by_user_id,
     });
   }
 

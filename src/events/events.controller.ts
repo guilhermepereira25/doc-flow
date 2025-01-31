@@ -10,6 +10,7 @@ import {
   BadRequestException,
   ConflictException,
   Query,
+  Req,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -23,6 +24,7 @@ import { GetAllEventsResponseDto } from './dto/get-all-events-response.dto';
 import { GetEventResponseDto } from './dto/get-event-response.dto';
 import { EndEventResponseDto } from './dto/end-event-response.dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
+import { UserRequest } from 'src';
 
 @Controller('events')
 export class EventsController {
@@ -36,8 +38,19 @@ export class EventsController {
   })
   @Profiles(Profile.Admin, Profile.Professor)
   @Post()
-  async create(@Res() res: Response, @Body() createEventDto: CreateEventDto) {
+  async create(
+    @Res() res: Response,
+    @Req() req: UserRequest,
+    @Body() createEventDto: CreateEventDto,
+  ) {
     try {
+      const userId = req.user?.sub;
+      if (!userId) {
+        return res
+          .status(401)
+          .json(new ApiResponseDto<null>(401, false, null, 'Unauthorized'));
+      }
+      createEventDto.created_by_user_id = userId;
       const event = await this.eventsService.create(createEventDto);
       return res
         .status(201)

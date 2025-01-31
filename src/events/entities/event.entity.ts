@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  BelongsTo,
   Column,
   DataType,
   HasMany,
@@ -10,6 +11,7 @@ import {
 import { Presence } from 'src/presences/entities/presence.entity';
 import { EventStatus } from '../enum/event-status.enum';
 import { File } from 'src/files/entities/file.entity';
+import { User } from 'src/users/entities/user.entity';
 @Scopes(() => ({
   withoutTimestamps: {
     attributes: {
@@ -88,9 +90,18 @@ export class Event extends Model {
   })
   updated_at: Date;
 
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  created_by_user_id: string;
+
   @HasMany(() => Presence, 'event_id')
   presences: Presence[];
 
   @HasMany(() => File, 'event_id')
   files: File[];
+
+  @BelongsTo(() => User, 'created_by_user_id')
+  user: User;
 }

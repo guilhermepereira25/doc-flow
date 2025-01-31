@@ -13,9 +13,12 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('api', app, documentFactory, {
+    jsonDocumentUrl: '/api-json',
+  });
 
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
 
   await app.listen(process.env.PORT ?? 3000);
 }

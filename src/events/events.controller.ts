@@ -9,6 +9,7 @@ import {
   Res,
   BadRequestException,
   ConflictException,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -70,9 +71,13 @@ export class EventsController {
     type: GetAllEventsResponseDto,
   })
   @Get()
-  async findAll(@Res() res: Response) {
+  async findAll(
+    @Res() res: Response,
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
+  ) {
     try {
-      const events = await this.eventsService.findAll();
+      const events = await this.eventsService.findAll(offset, limit);
       return res
         .status(200)
         .json(new ApiResponseDto<Event[]>(200, true, events, null));

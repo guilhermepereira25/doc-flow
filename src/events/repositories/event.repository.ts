@@ -21,8 +21,11 @@ export class EventRepositoryImpl implements EventRepository {
     });
   }
 
-  async findAll(): Promise<Event[]> {
-    return await this.eventModel.scope('withoutTimestamps').findAll();
+  async findAll(offset: number, limit: number): Promise<Event[]> {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      offset,
+      limit,
+    });
   }
 
   async findOne(id: string): Promise<Event> {

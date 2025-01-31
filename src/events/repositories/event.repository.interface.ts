@@ -4,7 +4,7 @@ import { Event } from '../entities/event.entity';
 
 export interface EventRepository {
   create(createEventDto: CreateEventDto): Promise<Event>;
-  findAll(): Promise<Event[]>;
+  findAll(offset: number, limit: number): Promise<Event[]>;
   findOne(id: string): Promise<Event>;
   update(id: string, updateEventDto: UpdateEventDto): Promise<Event>;
   remove(id: string): Promise<void>;

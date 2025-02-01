@@ -190,4 +190,38 @@ export class EventsController {
         );
     }
   }
+
+  @Get('user-events/:id')
+  async getMyEvents(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
+    @Req() req: UserRequest,
+  ) {
+    try {
+      if (req.user?.sub !== id || !id) {
+        return res
+          .status(401)
+          .json(new ApiResponseDto<null>(401, false, null, 'Unauthorized'));
+      }
+      const events = await this.eventsService.getEventsByUserId({
+        userId: id,
+        offset,
+        limit,
+      });
+      return res
+        .status(200)
+        .json(new ApiResponseDto<Event[]>(200, true, events, null));
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
+    }
+  }
 }

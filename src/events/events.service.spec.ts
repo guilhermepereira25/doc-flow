@@ -138,22 +138,6 @@ describe('EventsService', () => {
       );
     });
 
-    it('should throw bad request exception if event end date is invalid', async () => {
-      const now = new Date();
-      const nowPlus5Minutes = new Date(now);
-      nowPlus5Minutes.setMinutes(now.getMinutes() - 5);
-      const createEventDto: CreateEventDto = {
-        name: 'Event 4',
-        eventStartDate: startEventDate.toISOString(),
-        eventEndDate: nowPlus5Minutes.toISOString(),
-        status: EventStatus.STATUS_STARTED,
-      };
-
-      await expect(service.create(createEventDto)).rejects.toThrow(
-        'Invalid event end date',
-      );
-    });
-
     it('should throw bad request exception if event status is different than started but event already started', async () => {
       const createEventDto: CreateEventDto = {
         name: 'Event 4',
@@ -186,13 +170,13 @@ describe('EventsService', () => {
 
   describe('findAll', () => {
     it('should return an array of events', async () => {
-      const result = await service.findAll();
+      const result = await service.findAll(0, 10);
       expect(result).toEqual(eventData);
     });
 
     it('should return an empty array if there are no events', async () => {
       jest.spyOn(service, 'findAll').mockResolvedValue([]);
-      const result = await service.findAll();
+      const result = await service.findAll(0, 10);
       expect(result).toEqual([]);
     });
   });

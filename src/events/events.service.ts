@@ -94,6 +94,14 @@ export class EventsService {
     });
   }
 
+  async getEventsByUserId(data: {
+    userId: string;
+    offset: number;
+    limit: number;
+  }): Promise<Event[]> {
+    return await this.eventRepository.getEventsByUserId(data);
+  }
+
   private isValidEventEndDate(eventEndDate: Date, now: Date): boolean {
     const datePlusThenMinutes = new Date(now);
     datePlusThenMinutes.setMinutes(datePlusThenMinutes.getMinutes() + 10);
@@ -114,7 +122,7 @@ export class EventsService {
         if (eventStartDate >= now) {
           return [
             false,
-            'Event start date is in the future, status cannot be started',
+            'Event start date is in the future, status must be upcoming',
           ];
         }
         if (
@@ -128,7 +136,7 @@ export class EventsService {
         if (eventStartDate <= now) {
           return [
             false,
-            'Event start date is in the past, status cannot be upcoming',
+            'Event start date is in the past, status must be started',
           ];
         }
         break;

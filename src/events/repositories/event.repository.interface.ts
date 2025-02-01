@@ -2,6 +2,12 @@ import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
 import { Event } from '../entities/event.entity';
 
+interface GetEventsByUserIdParams {
+  userId: string;
+  offset: number;
+  limit: number;
+}
+
 export interface EventRepository {
   create(createEventDto: CreateEventDto): Promise<Event>;
   findAll(offset: number, limit: number): Promise<Event[]>;
@@ -13,4 +19,5 @@ export interface EventRepository {
   endEvent(id: string): Promise<null | Event>;
   getUpcomingEvents(): Promise<Event[]>;
   getEndedEvents(): Promise<Event[]>;
+  getEventsByUserId(args: GetEventsByUserIdParams): Promise<Event[]>;
 }

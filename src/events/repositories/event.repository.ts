@@ -90,4 +90,22 @@ export class EventRepositoryImpl implements EventRepository {
       },
     });
   }
+
+  async getEventsByUserId({
+    userId,
+    offset,
+    limit,
+  }: {
+    userId: string;
+    offset: number;
+    limit: number;
+  }): Promise<Event[]> {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      where: {
+        created_by_user_id: userId,
+      },
+      offset,
+      limit,
+    });
+  }
 }

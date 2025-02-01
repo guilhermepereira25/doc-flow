@@ -18,11 +18,15 @@ export class EventRepositoryImpl implements EventRepository {
       start_at: createEventDto.eventStartDate,
       end_at: createEventDto.eventEndDate,
       status: createEventDto.status,
+      created_by_user_id: createEventDto.created_by_user_id,
     });
   }
 
-  async findAll(): Promise<Event[]> {
-    return await this.eventModel.scope('withoutTimestamps').findAll();
+  async findAll(offset: number, limit: number): Promise<Event[]> {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      offset,
+      limit,
+    });
   }
 
   async findOne(id: string): Promise<Event> {
@@ -84,6 +88,24 @@ export class EventRepositoryImpl implements EventRepository {
           [Op.lte]: new Date(),
         },
       },
+    });
+  }
+
+  async getEventsByUserId({
+    userId,
+    offset,
+    limit,
+  }: {
+    userId: string;
+    offset: number;
+    limit: number;
+  }): Promise<Event[]> {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      where: {
+        created_by_user_id: userId,
+      },
+      offset,
+      limit,
     });
   }
 }

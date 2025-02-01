@@ -1,13 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class SignInAuthDto {
   @ApiProperty()
-  @IsString()
+  @IsEmail()
+  @Matches(/@cefet-rj\.br$/, {
+    message: 'Only email from cefet-rj.br domain are allowed',
+  })
   @IsNotEmpty()
-  username: string;
+  email: string;
 
   @ApiProperty()
+  @IsString()
   @IsNotEmpty()
   password: string;
 }

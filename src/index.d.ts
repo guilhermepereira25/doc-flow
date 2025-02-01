@@ -3,7 +3,7 @@ import { Profile } from './profile/entities/profile.entity';
 
 export type UserJwtPayload = {
   sub: string;
-  username: string;
+  email: string;
   profile: Profile;
 };
 

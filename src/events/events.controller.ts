@@ -9,6 +9,8 @@ import {
   Res,
   BadRequestException,
   ConflictException,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -22,6 +24,7 @@ import { GetAllEventsResponseDto } from './dto/get-all-events-response.dto';
 import { GetEventResponseDto } from './dto/get-event-response.dto';
 import { EndEventResponseDto } from './dto/end-event-response.dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
+import { UserRequest } from 'src';
 
 @Controller('events')
 export class EventsController {
@@ -35,8 +38,19 @@ export class EventsController {
   })
   @Profiles(Profile.Admin, Profile.Professor)
   @Post()
-  async create(@Res() res: Response, @Body() createEventDto: CreateEventDto) {
+  async create(
+    @Res() res: Response,
+    @Req() req: UserRequest,
+    @Body() createEventDto: CreateEventDto,
+  ) {
     try {
+      const userId = req.user?.sub;
+      if (!userId) {
+        return res
+          .status(401)
+          .json(new ApiResponseDto<null>(401, false, null, 'Unauthorized'));
+      }
+      createEventDto.created_by_user_id = userId;
       const event = await this.eventsService.create(createEventDto);
       return res
         .status(201)
@@ -70,9 +84,13 @@ export class EventsController {
     type: GetAllEventsResponseDto,
   })
   @Get()
-  async findAll(@Res() res: Response) {
+  async findAll(
+    @Res() res: Response,
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
+  ) {
     try {
-      const events = await this.eventsService.findAll();
+      const events = await this.eventsService.findAll(offset, limit);
       return res
         .status(200)
         .json(new ApiResponseDto<Event[]>(200, true, events, null));
@@ -161,6 +179,40 @@ export class EventsController {
       return res
         .status(200)
         .json(new ApiResponseDto<object>(200, true, {}, null));
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
+    }
+  }
+
+  @Get('user-events/:id')
+  async getMyEvents(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
+    @Req() req: UserRequest,
+  ) {
+    try {
+      if (req.user?.sub !== id || !id) {
+        return res
+          .status(401)
+          .json(new ApiResponseDto<null>(401, false, null, 'Unauthorized'));
+      }
+      const events = await this.eventsService.getEventsByUserId({
+        userId: id,
+        offset,
+        limit,
+      });
+      return res
+        .status(200)
+        .json(new ApiResponseDto<Event[]>(200, true, events, null));
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);

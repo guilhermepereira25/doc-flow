@@ -30,10 +30,6 @@ export class EventsService {
         ? new Date(createEventDto.eventEndDate)
         : null;
     const now = new Date();
-    if (eventEndDate !== null && !this.isValidEventEndDate(eventEndDate, now)) {
-      throw new BadRequestException('Invalid event end date');
-    }
-
     const eventStartDate = new Date(createEventDto.eventStartDate);
     if (createEventDto.status !== undefined) {
       const [result, message] = this.isValidEventStatusForEventDates(
@@ -52,11 +48,12 @@ export class EventsService {
       eventStartDate: eventStartDate.toISOString(),
       eventEndDate: eventEndDate?.toISOString() || null,
       status: createEventDto.status,
+      created_by_user_id: createEventDto.created_by_user_id,
     });
   }
 
-  async findAll(): Promise<Event[]> {
-    return await this.eventRepository.findAll();
+  async findAll(offset: number, limit: number): Promise<Event[]> {
+    return await this.eventRepository.findAll(offset, limit);
   }
 
   async findOne(id: string): Promise<[Event, boolean, boolean] | null> {
@@ -97,6 +94,14 @@ export class EventsService {
     });
   }
 
+  async getEventsByUserId(data: {
+    userId: string;
+    offset: number;
+    limit: number;
+  }): Promise<Event[]> {
+    return await this.eventRepository.getEventsByUserId(data);
+  }
+
   private isValidEventEndDate(eventEndDate: Date, now: Date): boolean {
     const datePlusThenMinutes = new Date(now);
     datePlusThenMinutes.setMinutes(datePlusThenMinutes.getMinutes() + 10);
@@ -112,25 +117,39 @@ export class EventsService {
     now: Date,
     status: EventStatus,
   ): [boolean, string | null] {
-    if (eventStartDate < now && status !== EventStatus.STATUS_STARTED) {
-      return [false, 'Event start date is in the past, status must be started'];
-    }
-    if (eventStartDate > now && status !== EventStatus.STATUS_UPCOMING) {
-      return [
-        false,
-        'Event start date is in the future, status must be upcoming',
-      ];
-    }
-    if (
-      eventStartDate < now &&
-      eventEndDate !== null &&
-      eventEndDate < now &&
-      status !== EventStatus.STATUS_ENDED
-    ) {
-      return [
-        false,
-        'Event start date and end date are in the past, status must be ended',
-      ];
+    switch (status) {
+      case EventStatus.STATUS_STARTED:
+        if (eventStartDate >= now) {
+          return [
+            false,
+            'Event start date is in the future, status must be upcoming',
+          ];
+        }
+        if (
+          eventEndDate !== null &&
+          !this.isValidEventEndDate(eventEndDate, now)
+        ) {
+          return [false, 'Invalid event end date'];
+        }
+        break;
+      case EventStatus.STATUS_UPCOMING:
+        if (eventStartDate <= now) {
+          return [
+            false,
+            'Event start date is in the past, status must be started',
+          ];
+        }
+        break;
+      case EventStatus.STATUS_ENDED:
+        if (eventEndDate === null || eventEndDate >= now) {
+          return [
+            false,
+            'Event end date is in the future, status cannot be ended',
+          ];
+        }
+        break;
+      default:
+        return [true, null];
     }
     return [true, null];
   }

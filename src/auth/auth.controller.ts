@@ -32,7 +32,7 @@ export class AuthController {
           .status(401)
           .json(new ApiResponseDto(401, false, null, 'Invalid credentials'));
       }
-      return res.status(200).json({ accessToken });
+      return res.status(200).json(accessToken);
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);

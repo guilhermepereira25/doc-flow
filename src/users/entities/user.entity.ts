@@ -37,14 +37,33 @@ export class User extends Model {
   id: string;
 
   @ApiProperty({
-    example: 'john_doe',
-    description: 'Username',
+    example: 'Jonh Doe',
+    description: 'Full name of the user',
   })
   @Column({
-    type: DataType.STRING(30),
+    type: DataType.STRING(100),
+  })
+  full_name: string;
+
+  @ApiProperty({
+    example: 'email@cefe-rj.br',
+    description: 'User email',
+  })
+  @Column({
+    type: DataType.STRING(254),
     allowNull: false,
   })
-  username: string;
+  email: string;
+
+  @ApiProperty({
+    example: '2020111SINF',
+    description: 'enrollment',
+  })
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: false,
+  })
+  enrollment: string;
 
   @Column({
     type: DataType.STRING(60),

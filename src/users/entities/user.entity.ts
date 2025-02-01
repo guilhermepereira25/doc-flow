@@ -43,7 +43,7 @@ export class User extends Model {
   @Column({
     type: DataType.STRING(100),
   })
-  fullName: string;
+  full_name: string;
 
   @ApiProperty({
     example: 'email@cefe-rj.br',

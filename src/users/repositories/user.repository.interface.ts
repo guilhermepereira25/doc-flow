@@ -8,6 +8,6 @@ export interface UserRepository {
   findOne(id: string): Promise<User>;
   update(id: string, updateUserDto: UpdateUserDto): Promise<[number, User[]]>;
   remove(id: string): Promise<number>;
-  findByUsername(username: string): Promise<User>;
+  findByEmail(email: string): Promise<User>;
   findByPk(id: string): Promise<User>;
 }

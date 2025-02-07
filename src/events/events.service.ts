@@ -68,7 +68,21 @@ export class EventsService {
     return [event, isStarted, isEnded];
   }
 
-  update(id: string, updateEventDto: UpdateEventDto) {
+  async update(id: string, updateEventDto: UpdateEventDto) {
+    if (updateEventDto.status != null) {
+      const [result, message] = this.isValidEventStatusForEventDates(
+        new Date(updateEventDto.eventStartDate),
+        updateEventDto.eventEndDate !== undefined
+          ? new Date(updateEventDto.eventEndDate)
+          : null,
+        new Date(),
+        updateEventDto.status,
+      );
+      if (!result && message !== null) {
+        throw new BadRequestException(message);
+      }
+    }
+
     return this.eventRepository.update(id, updateEventDto);
   }
 

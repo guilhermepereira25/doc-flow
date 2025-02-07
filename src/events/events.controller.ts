@@ -142,8 +142,30 @@ export class EventsController {
 
   @Profiles(Profile.Admin, Profile.Professor)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(id, updateEventDto);
+  async update(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Body() updateEventDto: UpdateEventDto,
+  ) {
+    try {
+      const result = await this.eventsService.update(id, updateEventDto);
+      return new ApiResponseDto<{ event: Event }>(
+        200,
+        true,
+        {
+          event: result,
+        },
+        null,
+      );
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      if (err instanceof BadRequestException) {
+        throw new BadRequestException('Invalid data');
+      }
+      throw new ConflictException(err.message);
+    }
   }
 
   @Profiles(Profile.Admin, Profile.Professor)

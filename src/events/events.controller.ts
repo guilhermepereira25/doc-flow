@@ -149,13 +149,15 @@ export class EventsController {
   ) {
     try {
       const result = await this.eventsService.update(id, updateEventDto);
-      return new ApiResponseDto<{ event: Event }>(
-        200,
-        true,
-        {
-          event: result,
-        },
-        null,
+      return res.status(200).json(
+        new ApiResponseDto<{ event: Event }>(
+          200,
+          true,
+          {
+            event: result,
+          },
+          null,
+        ),
       );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {

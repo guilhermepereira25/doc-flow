@@ -83,7 +83,7 @@ export class EventsService {
       }
     }
 
-    return this.eventRepository.update(id, updateEventDto);
+    return await this.eventRepository.update(id, updateEventDto);
   }
 
   async remove(id: string): Promise<void> {

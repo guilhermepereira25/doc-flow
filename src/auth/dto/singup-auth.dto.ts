@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   Matches,
@@ -23,6 +24,11 @@ export class SignUpAuthDto {
   password: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  fullName: string;
+
+  @ApiProperty()
   @Matches(/\d{4}\d{3}[A-Z]{4}$/, {
     message: 'Enrollment must be in the format 99992020SINF',
   })
@@ -33,5 +39,6 @@ export class SignUpAuthDto {
     required: false,
   })
   @IsString()
+  @IsOptional()
   profileId?: string;
 }

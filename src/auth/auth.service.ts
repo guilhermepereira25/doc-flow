@@ -62,7 +62,8 @@ export class AuthService {
     const newUser = await this.usersService.create({
       email: signupDto.email,
       password: hashedPassword,
-      profileId: signupDto.profileId,
+      enrollment: signupDto.enrollment,
+      full_name: signupDto.fullName,
     });
     const accessToken = await this.generateJwtPayloadAndGetAccessToken(
       newUser.data.user,

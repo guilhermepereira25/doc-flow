@@ -5,6 +5,7 @@ import { UpdateEventDto } from '../dto/update-event.dto';
 import { Event } from '../entities/event.entity';
 import { EventStatus } from '../enum/event-status.enum';
 import { Op } from 'sequelize';
+import { User } from 'src/users/entities/user.entity';
 
 export class EventRepositoryImpl implements EventRepository {
   constructor(
@@ -26,6 +27,12 @@ export class EventRepositoryImpl implements EventRepository {
     return await this.eventModel.scope('withoutTimestamps').findAll({
       offset,
       limit,
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'full_name'],
+        },
+      ],
     });
   }
 
@@ -74,7 +81,10 @@ export class EventRepositoryImpl implements EventRepository {
           [Op.lte]: new Date(),
         },
         end_at: {
-          [Op.eq]: null,
+          [Op.or]: {
+            [Op.not]: null,
+            [Op.gt]: new Date(),
+          },
         },
       },
     });
@@ -85,7 +95,7 @@ export class EventRepositoryImpl implements EventRepository {
       where: {
         status: EventStatus.STATUS_STARTED,
         end_at: {
-          [Op.lte]: new Date(),
+          [Op.lte]: new Date().toISOString(),
         },
       },
     });

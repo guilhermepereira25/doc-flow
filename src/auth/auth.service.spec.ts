@@ -17,6 +17,7 @@ describe('AuthService', () => {
     id: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
     email: 'email@cefet-rj.br',
     password: 'hashedPassword',
+    full_name: 'Name Example',
     profile: {
       id: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
       name: 'user',
@@ -79,6 +80,7 @@ describe('AuthService', () => {
         email: 'test',
         password: 'test',
         profileId: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
+        fullName: 'test',
       };
 
       jest.spyOn(usersService, 'findByEmail').mockResolvedValue(userData);
@@ -93,6 +95,7 @@ describe('AuthService', () => {
         email: 'test',
         password: 'test',
         profileId: 'eeb1b3b0-0b1b-4b3b-8b3b-0b1b3b0b3b0b',
+        fullName: 'test',
       };
 
       jest.spyOn(usersService, 'findByEmail').mockResolvedValue(null);

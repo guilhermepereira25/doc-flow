@@ -21,21 +21,11 @@ export class UserRepositoryImpl implements UserRepository {
         profile_id: profileId,
       },
       {
-        include: [
-          {
-            model: Profile,
-            attributes: ['id', 'name'],
-            include: [
-              {
-                model: Role,
-                attributes: ['id', 'name'],
-              },
-            ],
-          },
-        ],
+        returning: ['id'],
       },
     );
-    return newUser;
+    const user = await this.findByPk(newUser.id);
+    return user;
   }
 
   async findAll(limit: number, offset: number): Promise<User[]> {
@@ -98,6 +88,19 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findByPk(id: string): Promise<User> {
-    return this.userModel.scope('excludePassword').findByPk(id);
+    return this.userModel.scope('excludePassword').findByPk(id, {
+      include: [
+        {
+          model: Profile,
+          attributes: ['id', 'name'],
+          include: [
+            {
+              model: Role,
+              attributes: ['id', 'name'],
+            },
+          ],
+        },
+      ],
+    });
   }
 }

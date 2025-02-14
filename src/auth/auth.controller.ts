@@ -60,16 +60,7 @@ export class AuthController {
           .status(400)
           .json(new ApiResponseDto(400, false, null, 'User already exists'));
       }
-      return res.status(201).json(
-        new ApiResponseDto(
-          201,
-          true,
-          {
-            accessToken,
-          },
-          null,
-        ),
-      );
+      return res.status(201).json(accessToken);
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);

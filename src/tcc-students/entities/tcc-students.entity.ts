@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   DataType,
@@ -13,6 +14,10 @@ import { User } from 'src/users/entities/user.entity';
   timestamps: false,
 })
 export class TccStudents extends Model {
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'TCC Student ID',
+  })
   @Column({
     type: DataType.UUID,
     allowNull: false,
@@ -20,6 +25,10 @@ export class TccStudents extends Model {
   })
   id: string;
 
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'TCC ID',
+  })
   @ForeignKey(() => Tcc)
   @Column({
     type: DataType.UUID,
@@ -27,6 +36,10 @@ export class TccStudents extends Model {
   })
   tcc_id: string;
 
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'Student ID',
+  })
   @ForeignKey(() => User)
   @Column({
     type: DataType.UUID,
@@ -34,6 +47,10 @@ export class TccStudents extends Model {
   })
   student_id: string;
 
+  @ApiProperty({
+    example: '2021-01-01T00:00:00.000Z',
+    description: 'Created at',
+  })
   @Column({
     type: DataType.DATE,
     allowNull: false,
@@ -41,6 +58,10 @@ export class TccStudents extends Model {
   })
   created_at: Date;
 
+  @ApiProperty({
+    example: '2021-01-01T00:00:00.000Z',
+    description: 'Updated at',
+  })
   @Column({
     type: DataType.DATE,
     allowNull: false,

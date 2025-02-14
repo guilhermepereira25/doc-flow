@@ -5,6 +5,12 @@ export class AuthResponseDto extends OmitType(ApiResponseDto, [
   'data',
 ] as const) {
   @ApiProperty({
+    type: 'object',
+    properties: {
+      accessToken: {
+        type: 'string',
+      },
+    },
     example: {
       accessToken: 'some-jwt-token',
     },

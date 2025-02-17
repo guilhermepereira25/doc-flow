@@ -9,7 +9,7 @@ export interface FileRepository {
   update(id: string, updateFileDto: UpdateFileDto): Promise<string>;
   remove(id: string): Promise<number>;
   findByPk(id: string): Promise<File>;
-  findByUserId(id: string): Promise<File[]>;
+  findByUserId(id: string, limit: number, offset: number): Promise<File[]>;
   findByEventId(id: string): Promise<File[]>;
   findByUserIdAndEventId(userId: string, eventId: string): Promise<File[]>;
   findByUserIdAndEventIdAndType(

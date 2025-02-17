@@ -3,6 +3,7 @@ import { FileRepository } from './files.repository.interface';
 import { InjectModel } from '@nestjs/sequelize';
 import { File } from '../entities/file.entity';
 import { CreateFileDto } from '../dto/create-file.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class FileRepositoryImpl implements FileRepository {
@@ -50,11 +51,23 @@ export class FileRepositoryImpl implements FileRepository {
     return await this.fileModel.findByPk(id);
   }
 
-  async findByUserId(id: string): Promise<File[]> {
+  async findByUserId(
+    id: string,
+    limit: number,
+    offset: number,
+  ): Promise<File[]> {
     return await this.fileModel.findAll({
       where: {
         user_id: id,
       },
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'full_name'],
+        },
+      ],
+      limit,
+      offset,
     });
   }
 

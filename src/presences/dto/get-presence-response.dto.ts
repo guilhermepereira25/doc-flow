@@ -6,12 +6,17 @@ export class GetPresenceResponseDto extends OmitType(ApiResponseDto, [
   'data',
 ] as const) {
   @ApiProperty({
-    example: {
-      data: {
-        presence: {
-          id: '550e8400-e29b-41d4-a716-446655440000',
-          event_id: '550e8400-e29b-41d4-a716-446655440000',
-          user_id: '550e8400-e29b-41d4-a716-446655440000',
+    type: 'object',
+    properties: {
+      presence: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          userId: { type: 'string' },
+          eventId: { type: 'string' },
+          isPresent: { type: 'boolean' },
+          createdAt: { type: 'string' },
+          updatedAt: { type: 'string' },
         },
       },
     },

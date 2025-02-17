@@ -93,7 +93,9 @@ export class EventsController {
       const events = await this.eventsService.findAll(offset, limit);
       return res
         .status(200)
-        .json(new ApiResponseDto<Event[]>(200, true, events, null));
+        .json(
+          new ApiResponseDto<{ events: Event[] }>(200, true, { events }, null),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);
@@ -236,7 +238,9 @@ export class EventsController {
       });
       return res
         .status(200)
-        .json(new ApiResponseDto<Event[]>(200, true, events, null));
+        .json(
+          new ApiResponseDto<{ events: Event[] }>(200, true, { events }, null),
+        );
     } catch (err) {
       if (process.env.APP_ENV === 'development') {
         console.error(err);

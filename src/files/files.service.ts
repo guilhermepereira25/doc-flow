@@ -54,8 +54,8 @@ export class FilesService {
     return await this.fileRepository.findOne(id);
   }
 
-  async findByUserId(id: string) {
-    return await this.fileRepository.findByUserId(id);
+  async findByUserId(id: string, limit: number, offset: number) {
+    return await this.fileRepository.findByUserId(id, limit, offset);
   }
 
   async findByEventId(id: string) {

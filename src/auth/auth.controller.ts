@@ -5,8 +5,8 @@ import { Response } from 'express';
 import { SignUpAuthDto } from './dto/singup-auth.dto';
 import { Public } from './decorators/public-auth.decorator';
 import { ApiResponse } from '@nestjs/swagger';
-import { AuthResponseDto } from './dto/auth-response-dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
+import { AccessTokenResponseDto } from './dto/access-token-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +15,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Sign in',
-    type: AuthResponseDto,
+    type: AccessTokenResponseDto,
   })
   @ApiResponse({
     status: 401,
@@ -48,7 +48,7 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'Sign up',
-    type: AuthResponseDto,
+    type: AccessTokenResponseDto,
   })
   @Public()
   @Post('signup')

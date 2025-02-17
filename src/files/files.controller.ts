@@ -11,6 +11,7 @@ import {
   Res,
   Req,
   ConflictException,
+  Query,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { UpdateFileDto } from './dto/update-file.dto';
@@ -184,6 +185,42 @@ export class FilesController {
           .status(409)
           .json(new ApiResponseDto<null>(409, false, null, err.message));
       }
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
+    }
+  }
+
+  @Get('user')
+  async findAllByUser(
+    @Req() req: UserRequest,
+    @Res() res: Response,
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+  ) {
+    try {
+      const files = await this.filesService.findByUserId(
+        req.user.sub,
+        limit,
+        offset,
+      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ files: File[] } | null>(
+            200,
+            true,
+            { files },
+            null,
+          ),
+        );
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+
       return res
         .status(500)
         .json(

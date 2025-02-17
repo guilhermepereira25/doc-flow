@@ -5,6 +5,12 @@ export class EndEventResponseDto extends OmitType(ApiResponseDto, [
   'data',
 ] as const) {
   @ApiProperty({
+    type: 'object',
+    properties: {
+      message: {
+        type: 'string',
+      },
+    },
     example: {
       message: 'Event ended',
     },

@@ -5,8 +5,9 @@ export class DownloadFileResponseDto extends OmitType(ApiResponseDto, [
   'data',
 ] as const) {
   @ApiProperty({
-    example: {
-      message: 'File enqueued to be processed',
+    type: 'object',
+    properties: {
+      message: { type: 'string', example: 'File downloaded successfully' },
     },
   })
   data: {

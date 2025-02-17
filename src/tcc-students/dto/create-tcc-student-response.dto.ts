@@ -6,7 +6,19 @@ export class CreateTccStudentResponseDto extends OmitType(ApiResponseDto, [
   'data',
 ] as const) {
   @ApiProperty({
-    type: ApiResponseDto<{ tccStudent: TccStudents }>,
+    type: 'object',
+    properties: {
+      tccStudent: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          tcc_id: { type: 'string' },
+          student_id: { type: 'string' },
+          created_at: { type: 'string' },
+          updated_at: { type: 'string' },
+        },
+      },
+    },
   })
   data: {
     tccStudent: TccStudents;

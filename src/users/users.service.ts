@@ -4,7 +4,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repositories/user.repository.interface';
 import { USER_REPOSITORY } from './repositories/user-repository.token';
 import { ProfileService } from '../profile/profile.service';
-import { Profile as ProfileModel } from 'src/profile/entities/profile.entity';
 import { ServiceLayerDto } from 'src/lib/dto/service-layer.dto';
 import { User } from './entities/user.entity';
 @Injectable()
@@ -18,10 +17,7 @@ export class UsersService {
   async create(
     createUserDto: CreateUserDto,
   ): Promise<ServiceLayerDto<{ user: User }>> {
-    let profile: ProfileModel | null;
-
-    // eslint-disable-next-line prefer-const
-    profile = await this.profileService.findOne(createUserDto.profileId);
+    const profile = await this.profileService.findOne(createUserDto.profileId);
     if (!profile) {
       throw new Error('Profile not found');
     }

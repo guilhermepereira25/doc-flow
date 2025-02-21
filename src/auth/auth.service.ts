@@ -5,7 +5,6 @@ import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { SignUpAuthDto } from './dto/singup-auth.dto';
-import { Logger } from '@nestjs/common';
 @Injectable()
 export class AuthService {
   constructor(
@@ -56,7 +55,6 @@ export class AuthService {
 
   async signUp(signupDto: SignUpAuthDto): Promise<{ access_token: string }> {
     const user = await this.usersService.findByEmail(signupDto.email);
-    Logger.log(signupDto.profileId);
     if (user) {
       throw new Error('User already exists');
     }

@@ -21,12 +21,14 @@ export class UsersService {
   ): Promise<ServiceLayerDto<{ user: User }>> {
     let profile: ProfileModel | null;
     if (!createUserDto.profileId) {
+      console.log('Nao veio profissional');
       profile = await this.profileService.findByProfileName(ProfileEnum.User);
       if (!profile) {
         throw new Error('Profile not found');
       }
       createUserDto.profileId = profile.id;
     } else {
+      console.log('id profissional: ' + createUserDto.profileId);
       profile = await this.profileService.findOne(createUserDto.profileId);
       if (!profile) {
         throw new Error('Profile not found');

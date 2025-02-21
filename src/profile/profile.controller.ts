@@ -19,6 +19,7 @@ import { Profile as ProfileModel } from './entities/profile.entity';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetAllProfilesResponseDto } from './dto/get-all-profiles-response.dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
+import { Public } from '../auth/decorators/public-auth.decorator';
 
 @Controller('profile')
 export class ProfileController {
@@ -76,6 +77,7 @@ export class ProfileController {
     description: 'Return all profiles',
     type: GetAllProfilesResponseDto,
   })
+  @Public()
   @Get()
   async findAll(@Res() res: Response) {
     try {

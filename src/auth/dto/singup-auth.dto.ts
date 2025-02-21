@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
   IsStrongPassword,
   Matches,
@@ -39,6 +38,5 @@ export class SignUpAuthDto {
     required: false,
   })
   @IsString()
-  @IsOptional()
   profileId?: string;
 }

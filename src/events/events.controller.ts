@@ -25,6 +25,7 @@ import { GetEventResponseDto } from './dto/get-event-response.dto';
 import { EndEventResponseDto } from './dto/end-event-response.dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 import { UserRequest } from 'src';
+import { Logger } from '@nestjs/common';
 
 @Controller('events')
 export class EventsController {
@@ -45,6 +46,8 @@ export class EventsController {
   ) {
     try {
       const userId = req.user?.sub;
+      Logger.log('dto do evento lat: ', createEventDto.latitude);
+      Logger.log('dto do evento long: ', createEventDto.longitude);
       if (!userId) {
         return res
           .status(401)
@@ -142,7 +145,7 @@ export class EventsController {
     }
   }
 
-  @Profiles(Profile.Admin, Profile.Professor)
+  @Profiles(Profile.Admin, Profile.Professor, Profile.Student)
   @Patch(':id')
   async update(
     @Res() res: Response,
@@ -150,6 +153,7 @@ export class EventsController {
     @Body() updateEventDto: UpdateEventDto,
   ) {
     try {
+      Logger.log('Testee att');
       const result = await this.eventsService.update(id, updateEventDto);
       return res.status(200).json(
         new ApiResponseDto<{ event: Event }>(

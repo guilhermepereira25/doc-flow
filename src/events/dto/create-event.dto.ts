@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsNumber,
 } from 'class-validator';
 import { EventStatus } from '../enum/event-status.enum';
 
@@ -39,4 +40,15 @@ export class CreateEventDto {
   @IsString()
   @IsOptional()
   created_by_user_id?: string;
+
+  @IsNumber()
+  @IsOptional()
+  latitude: number;
+
+  @IsNumber()
+  @IsOptional()
+  longitude: number;
+
+  @IsNumber()
+  vagas: number;
 }

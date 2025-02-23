@@ -49,6 +49,9 @@ export class EventsService {
       eventEndDate: eventEndDate?.toISOString() || null,
       status: createEventDto.status,
       created_by_user_id: createEventDto.created_by_user_id,
+      latitude: createEventDto.latitude,
+      longitude: createEventDto.longitude,
+      vagas: createEventDto.vagas,
     });
   }
 

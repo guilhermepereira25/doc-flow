@@ -67,6 +67,38 @@ export class Presence extends Model {
   })
   updated_at: Date;
 
+  @ApiProperty({
+    example: 'inscrito',
+    description: 'Status da Presença',
+  })
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  status: string;
+
+  @ApiProperty({
+    example: '2021-01-01T00:00:00.000Z',
+    description: 'Check in Date',
+  })
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+    defaultValue: null,
+  })
+  check_in_date: Date;
+
+  @ApiProperty({
+    example: '2021-01-01T00:00:00.000Z',
+    description: 'Check out Date',
+  })
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+    defaultValue: null,
+  })
+  check_out_date: Date;
+
   @BelongsTo(() => User, 'user_id')
   user: User;
 

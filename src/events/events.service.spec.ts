@@ -115,7 +115,7 @@ describe('EventsService', () => {
         status: EventStatus.STATUS_STARTED,
         latitude: 0,
         longitude: 0,
-        vagas: 10,
+        vacancies: 10,
       };
 
       const result = await service.create(createEventDto);
@@ -136,7 +136,7 @@ describe('EventsService', () => {
         status: EventStatus.STATUS_STARTED,
         latitude: 0,
         longitude: 0,
-        vagas: 10,
+        vacancies: 10,
       };
 
       await expect(service.create(createEventDto)).rejects.toThrow(
@@ -152,7 +152,7 @@ describe('EventsService', () => {
         status: EventStatus.STATUS_UPCOMING,
         latitude: 0,
         longitude: 0,
-        vagas: 10,
+        vacancies: 10,
       };
 
       await expect(service.create(createEventDto)).rejects.toThrow(
@@ -171,7 +171,7 @@ describe('EventsService', () => {
         status: EventStatus.STATUS_STARTED,
         latitude: 0,
         longitude: 0,
-        vagas: 10,
+        vacancies: 10,
       };
 
       await expect(service.create(createEventDto)).rejects.toThrow(

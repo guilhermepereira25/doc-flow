@@ -22,7 +22,7 @@ export class EventRepositoryImpl implements EventRepository {
       created_by_user_id: createEventDto.created_by_user_id,
       latitude: createEventDto.latitude,
       longitude: createEventDto.longitude,
-      vagas: createEventDto.vagas,
+      vacancies: createEventDto.vacancies,
     });
   }
 

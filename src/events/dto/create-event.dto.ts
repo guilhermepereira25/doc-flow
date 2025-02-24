@@ -50,5 +50,5 @@ export class CreateEventDto {
   longitude: number;
 
   @IsNumber()
-  vagas: number;
+  vacancies: number;
 }

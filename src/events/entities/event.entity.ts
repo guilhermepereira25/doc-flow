@@ -112,7 +112,7 @@ export class Event extends Model {
     type: DataType.INTEGER,
     allowNull: false,
   })
-  vagas: number;
+  vacancies: number;
 
   @HasMany(() => Presence, 'event_id')
   presences: Presence[];

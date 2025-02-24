@@ -72,7 +72,7 @@ export class Presence extends Model {
     description: 'Status da Presença',
   })
   @Column({
-    type: DataType.UUID,
+    type: DataType.STRING,
     allowNull: false,
   })
   status: string;

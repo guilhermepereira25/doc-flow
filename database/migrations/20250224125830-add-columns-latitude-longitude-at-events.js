@@ -11,11 +11,11 @@ module.exports = {
      */
     await queryInterface.addColumn('events', 'latitude', {
       type: Sequelize.FLOAT,
-      allowNull: false,
+      default: 0,
     });
     await queryInterface.addColumn('events', 'longitude', {
       type: Sequelize.FLOAT,
-      allowNull: false,
+      default: 0,
     });
   },
 

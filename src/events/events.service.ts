@@ -119,6 +119,10 @@ export class EventsService {
     return await this.eventRepository.getEventsByUserId(data);
   }
 
+  async search(q: string) {
+    return await this.eventRepository.search(q);
+  }
+
   private isValidEventEndDate(eventEndDate: Date, now: Date): boolean {
     const datePlusThenMinutes = new Date(now);
     datePlusThenMinutes.setMinutes(datePlusThenMinutes.getMinutes() + 10);

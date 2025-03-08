@@ -25,7 +25,6 @@ import { GetEventResponseDto } from './dto/get-event-response.dto';
 import { EndEventResponseDto } from './dto/end-event-response.dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
 import { UserRequest } from 'src';
-import { Logger } from '@nestjs/common';
 
 @Controller('events')
 export class EventsController {
@@ -46,8 +45,6 @@ export class EventsController {
   ) {
     try {
       const userId = req.user?.sub;
-      Logger.log('dto do evento lat: ', createEventDto.latitude);
-      Logger.log('dto do evento long: ', createEventDto.longitude);
       if (!userId) {
         return res
           .status(401)
@@ -111,6 +108,27 @@ export class EventsController {
     }
   }
 
+  @Get('search')
+  async search(@Res() res: Response, @Query('q') q: string) {
+    try {
+      const events = await this.eventsService.search(q);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ events: Event[] }>(200, true, { events }, null),
+        );
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
+    }
+  }
+
   @ApiOperation({ summary: 'Return an event' })
   @ApiResponse({
     status: 200,
@@ -153,7 +171,6 @@ export class EventsController {
     @Body() updateEventDto: UpdateEventDto,
   ) {
     try {
-      Logger.log('Testee att');
       const result = await this.eventsService.update(id, updateEventDto);
       return res.status(200).json(
         new ApiResponseDto<{ event: Event }>(
@@ -222,7 +239,7 @@ export class EventsController {
   }
 
   @Get('user-events/:id')
-  async getMyEvents(
+  async getUserEvents(
     @Res() res: Response,
     @Param('id') id: string,
     @Query('offset') offset: number,

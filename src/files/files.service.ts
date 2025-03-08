@@ -72,7 +72,9 @@ export class FilesService {
     if (!fileData) {
       throw new Error('File not found');
     }
-    await unlink(fileData.path);
+    if (fileData.status != FileStatus.STATUS_PROCESSING && fileData.path) {
+      await unlink(fileData.path);
+    }
     await this.fileRepository.remove(id);
   }
 

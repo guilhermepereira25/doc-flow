@@ -121,4 +121,14 @@ export class EventRepositoryImpl implements EventRepository {
       limit,
     });
   }
+
+  async search(q: string) {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      where: {
+        name: {
+          [Op.iLike]: `%${q}%`,
+        },
+      },
+    });
+  }
 }

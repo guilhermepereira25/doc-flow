@@ -20,4 +20,5 @@ export interface EventRepository {
   getUpcomingEvents(): Promise<Event[]>;
   getEndedEvents(): Promise<Event[]>;
   getEventsByUserId(args: GetEventsByUserIdParams): Promise<Event[]>;
+  search(query: string): Promise<Event[]>;
 }

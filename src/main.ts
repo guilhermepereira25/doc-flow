@@ -7,8 +7,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   loadSwagger(app);
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-
-  app.enableCors();
+  app.enableCors({
+    exposedHeaders: ['Content-Disposition'],
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

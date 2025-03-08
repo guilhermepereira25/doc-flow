@@ -20,6 +20,9 @@ export class EventRepositoryImpl implements EventRepository {
       end_at: createEventDto.eventEndDate,
       status: createEventDto.status,
       created_by_user_id: createEventDto.created_by_user_id,
+      latitude: createEventDto?.latitude || 0,
+      longitude: createEventDto.longitude || 0,
+      vacancies: createEventDto.vacancies,
     });
   }
 
@@ -116,6 +119,16 @@ export class EventRepositoryImpl implements EventRepository {
       },
       offset,
       limit,
+    });
+  }
+
+  async search(q: string) {
+    return await this.eventModel.scope('withoutTimestamps').findAll({
+      where: {
+        name: {
+          [Op.iLike]: `%${q}%`,
+        },
+      },
     });
   }
 }

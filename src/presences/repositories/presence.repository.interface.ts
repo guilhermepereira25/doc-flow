@@ -12,6 +12,9 @@ export interface PresenceRepository {
   findOrCreatedPresence(
     userId: string,
     eventId: string,
+    status: string,
+    checkInDate: string,
+    checkOutDate: string,
   ): Promise<[Presence, boolean]>;
   findAllByEvent(eventId: string): Promise<Presence[]>;
   findAllByUser(userId: string): Promise<Presence[]>;

@@ -113,6 +113,9 @@ describe('EventsService', () => {
         eventStartDate: startEventDate.toISOString(),
         eventEndDate: undefined,
         status: EventStatus.STATUS_STARTED,
+        latitude: 0,
+        longitude: 0,
+        vacancies: 10,
       };
 
       const result = await service.create(createEventDto);
@@ -131,6 +134,9 @@ describe('EventsService', () => {
         eventStartDate: new Date().toISOString(),
         eventEndDate: undefined,
         status: EventStatus.STATUS_STARTED,
+        latitude: 0,
+        longitude: 0,
+        vacancies: 10,
       };
 
       await expect(service.create(createEventDto)).rejects.toThrow(
@@ -144,6 +150,9 @@ describe('EventsService', () => {
         eventStartDate: startEventDate.toISOString(),
         eventEndDate: undefined,
         status: EventStatus.STATUS_UPCOMING,
+        latitude: 0,
+        longitude: 0,
+        vacancies: 10,
       };
 
       await expect(service.create(createEventDto)).rejects.toThrow(
@@ -160,6 +169,9 @@ describe('EventsService', () => {
         eventStartDate: nowPlusOneMonth.toISOString(),
         eventEndDate: undefined,
         status: EventStatus.STATUS_STARTED,
+        latitude: 0,
+        longitude: 0,
+        vacancies: 10,
       };
 
       await expect(service.create(createEventDto)).rejects.toThrow(

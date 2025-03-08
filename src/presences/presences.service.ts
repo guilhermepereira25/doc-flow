@@ -38,6 +38,9 @@ export class PresencesService {
       await this.presenceRepository.findOrCreatedPresence(
         userId,
         createPresenceDto.event_id,
+        createPresenceDto.status,
+        createPresenceDto.check_in_date,
+        createPresenceDto.check_out_date,
       );
     if (!created) {
       return null;

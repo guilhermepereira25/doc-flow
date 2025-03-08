@@ -44,11 +44,15 @@ export class PresenceRepositoryImpl implements PresenceRepository {
   async findOrCreatedPresence(
     userId: string,
     eventId: string,
+    status: string,
+    checkOutDate: string,
   ): Promise<[Presence, boolean]> {
     return await this.presenceModel.findOrCreate({
       where: {
         user_id: userId,
         event_id: eventId,
+        status: status,
+        check_out_date: checkOutDate,
       },
     });
   }

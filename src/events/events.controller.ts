@@ -108,6 +108,27 @@ export class EventsController {
     }
   }
 
+  @Get('search')
+  async search(@Res() res: Response, @Query('q') q: string) {
+    try {
+      const events = await this.eventsService.search(q);
+      return res
+        .status(200)
+        .json(
+          new ApiResponseDto<{ events: Event[] }>(200, true, { events }, null),
+        );
+    } catch (err) {
+      if (process.env.APP_ENV === 'development') {
+        console.error(err);
+      }
+      return res
+        .status(500)
+        .json(
+          new ApiResponseDto<null>(500, false, null, 'Internal server error'),
+        );
+    }
+  }
+
   @ApiOperation({ summary: 'Return an event' })
   @ApiResponse({
     status: 200,
@@ -142,7 +163,7 @@ export class EventsController {
     }
   }
 
-  @Profiles(Profile.Admin, Profile.Professor)
+  @Profiles(Profile.Admin, Profile.Professor, Profile.Student)
   @Patch(':id')
   async update(
     @Res() res: Response,
@@ -218,7 +239,7 @@ export class EventsController {
   }
 
   @Get('user-events/:id')
-  async getMyEvents(
+  async getUserEvents(
     @Res() res: Response,
     @Param('id') id: string,
     @Query('offset') offset: number,

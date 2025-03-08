@@ -28,6 +28,7 @@ import { GetPresenceResponseDto } from './dto/get-presence-response.dto';
 import { GetAllPresencesByEventResponseDto } from './dto/get-all-presences-by-event-response.dto';
 import { GetAllPresencesByUserResponseDto } from './dto/get-all-presences-by-user-response.dto';
 import { ApiResponseDto } from 'src/lib/dto/api-response.dto';
+import { Logger } from '@nestjs/common';
 
 @Controller('presences')
 export class PresencesController {
@@ -55,6 +56,14 @@ export class PresencesController {
   ) {
     try {
       const userId: string = req.user?.sub;
+      Logger.log(
+        'dto da presença check in date: ',
+        createPresenceDto.check_in_date,
+      );
+      Logger.log(
+        'dto da presença check out: ',
+        createPresenceDto.check_out_date,
+      );
       if (!userId) {
         return res
           .status(401)
@@ -164,7 +173,7 @@ export class PresencesController {
     }
   }
 
-  @Profiles(Profile.Admin, Profile.Professor)
+  @Profiles(Profile.Admin, Profile.Professor, Profile.Student)
   @Patch(':id')
   async update(
     @Param('id') id: string,

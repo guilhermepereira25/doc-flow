@@ -27,7 +27,7 @@ module.exports = {
     await queryInterface.addIndex('events', ['status']);
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add reverting commands here.
      *
@@ -36,9 +36,8 @@ module.exports = {
      */
     await queryInterface.removeColumn('events', 'start_at');
     await queryInterface.removeColumn('events', 'end_at');
-    await queryInterface.removeColumn('events', 'status');
     await queryInterface.removeIndex('events', ['start_at']);
     await queryInterface.removeIndex('events', ['end_at']);
     await queryInterface.removeIndex('events', ['status']);
-  }
+  },
 };

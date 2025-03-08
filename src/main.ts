@@ -6,8 +6,10 @@ import { loadSwagger } from './lib/load-swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   loadSwagger(app);
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors();
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.enableCors({
+    exposedHeaders: ['Content-Disposition'],
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

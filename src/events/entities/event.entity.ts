@@ -96,6 +96,24 @@ export class Event extends Model {
   })
   created_by_user_id: string;
 
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
+  })
+  latitude: number;
+
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
+  })
+  longitude: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  vacancies: number;
+
   @HasMany(() => Presence, 'event_id')
   presences: Presence[];
 

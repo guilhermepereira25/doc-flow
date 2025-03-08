@@ -305,7 +305,7 @@ export class FilesController {
           if (process.env.APP_ENV === 'development') {
             console.error(err);
           }
-          res
+          return res
             .status(500)
             .json(
               new ApiResponseDto<null>(

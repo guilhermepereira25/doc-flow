@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { File } from '../entities/file.entity';
 import { CreateFileDto } from '../dto/create-file.dto';
 import { User } from 'src/users/entities/user.entity';
+import { Event } from 'src/events/entities/event.entity';
 
 @Injectable()
 export class FileRepositoryImpl implements FileRepository {
@@ -64,6 +65,10 @@ export class FileRepositoryImpl implements FileRepository {
         {
           model: User,
           attributes: ['id', 'full_name'],
+        },
+        {
+          model: Event,
+          attributes: ['id', 'name'],
         },
       ],
       limit,

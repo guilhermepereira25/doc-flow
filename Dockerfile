@@ -12,6 +12,8 @@ COPY .env ./
 
 COPY . .
 
+RUN mkdir -p log/cron
+
 EXPOSE 3000
 CMD [ "npm", "run", "start" ]
 

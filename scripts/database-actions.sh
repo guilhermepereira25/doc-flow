@@ -13,4 +13,5 @@ function seed() {
   npx sequelize-cli db:seed:all;
 }
 
-$1
+migrate;
+seed;

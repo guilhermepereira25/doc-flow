@@ -27,7 +27,7 @@ services:
       - ./.env
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./scripts:/docker-entrypoint-initdb.d
+      - ./scripts/init-extensions.sh:/docker-entrypoint-initdb.d/init-extensions.sh
     networks:
       - network-doc-flow
 
@@ -39,8 +39,8 @@ services:
     networks:
       - network-doc-flow
 
-  migrate:
-    container_name: doc-flow-migrate
+  migrate-seed:
+    container_name: doc-flow-migrate-seed
     build: 
       context: .
       dockerfile: Dockerfile
@@ -52,24 +52,7 @@ services:
     command: [
       "sh",
       "-c",
-      "/var/www/app/database-actions.sh migrate"
-    ]
-
-  seed:
-    container_name: doc-flow-seed
-    build: 
-      context: .
-      dockerfile: Dockerfile
-      target: db-actions-build
-    networks:
-      - network-doc-flow
-    depends_on:
-      - migrate
-      - postgres
-    command: [
-      "sh",
-      "-c",
-      "/var/www/app/database-actions.sh seed"
+      "/var/www/app/database-actions.sh"
     ]
 
   redis:
